@@ -37,7 +37,7 @@ public class CriticalTextAnalyzer1 {
         
        
         for(int i=0;i<no_of_words;i++)
-        {   
+        {    
             flag=0;
             alpha=0;
             if(Character.isLetter(words[i].charAt(0)) || words[i].charAt(0) == '_')
