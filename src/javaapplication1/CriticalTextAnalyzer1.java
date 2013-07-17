@@ -8,7 +8,7 @@ import java.io.*;
 
 public class CriticalTextAnalyzer1 {
 
-    //Test..
+    
     //Variable to hold the file path
     public static String file_path="";
     //Variable to hold the one line data
