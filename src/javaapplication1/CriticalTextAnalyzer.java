@@ -33,7 +33,7 @@ public class CriticalTextAnalyzer {
         int flag=0;
         word_1 = splitter.nextToken();
         word_2 = splitter.nextToken();
-        int alph_word_count_for_line = 0;
+        int alph_word_count_for_line = 0; 
         for(int i=0;i<numTokens;i++)
         {                    
              flag=0;             
