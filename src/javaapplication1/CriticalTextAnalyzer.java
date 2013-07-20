@@ -1,9 +1,8 @@
-package javaapplication1;
-
 /**
  *
  * @author Shane
  */
+
 import java.io.*;
 import java.util.StringTokenizer;
 
@@ -19,6 +18,7 @@ public class CriticalTextAnalyzer {
     
     CriticalTextAnalyzer(String u_file_path) 
     {
+        //Intializes file path sent while object creationg to the variable file_path
         file_path=u_file_path;        
     }    
     public int getNumTokens()
@@ -33,21 +33,26 @@ public class CriticalTextAnalyzer {
         
         for(int i=0;i<numTokens;i++)
         {    
+             //Read next token in current line
              word = splitter.nextToken();
              
+             //Checks whether the first character is either a letter or an underscore
              if (Character.isLetter(word.charAt(0)) || word.charAt(0) == '_')
              {     
+                 //Checks whether the token is NOT an underscore and only with a length of 1
                  if(!((word.charAt(0) == '_') & (word.length()==1)))
                  {
+                     //Increament token count found in current line
                       alph_word_count_for_line += 1;
                  }                         
              }          
              
         }       
+        //return alphanumeric token count of current line
         return alph_word_count_for_line;
     }
     
-    public int read_file_contents()
+    public void read_file_contents()
     {
          try{
 
@@ -56,8 +61,6 @@ public class CriticalTextAnalyzer {
         BufferedReader bufferReader = new BufferedReader(fileToRead);        
         // Read file line by line and print on the console
         
-        
-       
         while ((line = bufferReader.readLine()) != null)   
         {
                  tot_alpha_word_count+= getNumTokens();
@@ -65,21 +68,39 @@ public class CriticalTextAnalyzer {
         
         //Close the buffer reader
         bufferReader.close();
+        
+        //Display final total count of Alphanumeric Tokens
+        System.out.println("\nTotal count of Alphanumeric Tokens : " + tot_alpha_word_count);
+        System.out.println("\n***************************************************************\n");
         }
         catch(Exception e)
         {
                 System.out.println("Error..!! Unable to read line..!!" 
-                + e.getMessage());                      
+                + e.getMessage()+"\n");                      
         }
-        return tot_alpha_word_count;
+        
     }
     
     public static void main(String args[])
     {
-        System.out.print("Please enter file name in the current directory to anaylse : ");
-        
-        CriticalTextAnalyzer c = new CriticalTextAnalyzer(args[0]);
-        System.out.println(c.read_file_contents());
-           
+        System.out.println("\n******************Critical Text Analyzer***********************\n");
+        String path="";
+        do{
+            System.out.print("Please enter file name in the current directory to anaylse : ");
+            //Get file path directory from user
+            path = System.console().readLine();
+
+            if (path.equals(""))
+            {
+                System.out.println("\nNo input found\n");                
+            }
+            else
+            {
+                //Create new object of class along with passing the file path
+                CriticalTextAnalyzer c = new CriticalTextAnalyzer(path);  
+                c.read_file_contents();                
+            }
+        }while(path.equals(""));
+          
     }
 }
