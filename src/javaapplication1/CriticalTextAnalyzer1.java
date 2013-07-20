@@ -30,7 +30,7 @@ public class CriticalTextAnalyzer1 {
         //Variable to hold the flag value whether the token is an alphanumeric token
         int flag=0;
         //Variable to hold the flag value whether the token has atleast one letter
-        int alpha=0;
+        //int alpha=0;
         
         
         String[] words=line.split("\\s+");
@@ -40,17 +40,17 @@ public class CriticalTextAnalyzer1 {
         for(int i=0;i<no_of_words;i++)
         {    
             flag=0;
-            alpha=0;
+            //alpha=0;
             if(Character.isLetter(words[i].charAt(0)) || words[i].charAt(0) == '_')
             {
                 if(!((words[i].charAt(0) == '_') & (words[i].length()==1)))
                 {                       
                     for(int x=0;x<words[i].length();x++)
                     {
-                        if(Character.isLetter(words[i].charAt(0)))
-                        {
-                                alpha=1;
-                        }
+                        //if(Character.isLetter(words[i].charAt(0)))
+                        //{
+                        //        alpha=1;
+                        //}
                         
                         if(!String.valueOf(words[i].charAt(x)).matches("[0-9A-Za-z_]"))
                         {
@@ -67,7 +67,8 @@ public class CriticalTextAnalyzer1 {
             {
                 flag=1;
             } 
-            if (flag==0 && alpha==1)
+            //if (flag==0 && alpha==1)
+            if (flag==0)
             {
                 alph_word_count_for_line +=1;
             }
