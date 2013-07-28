@@ -141,6 +141,10 @@ public class CriticalTextAnalyzer {
                     {
                         flag_3=1;
                     }
+                    else
+                    {
+                        flag_3=0;
+                    }
                     return 0;
                 }
                 else
@@ -196,7 +200,7 @@ public class CriticalTextAnalyzer {
                  {
                      //Increament token count found in current line
                       alph_word_count_for_line += 1;
-//                      System.out.println(word);
+                      System.out.println(word);
                  }                         
              }          
              
@@ -326,7 +330,7 @@ public class CriticalTextAnalyzer {
 //                st_flag_c=0;    
             
             tot_alpha_word_count+= getNumTokens();
-//            System.out.println(tot_alpha_word_count);
+            System.out.println(tot_alpha_word_count);
 
 //            fw_flag_c=0;
 //            if((st_flag_c!=2) & (st_flag_c<=2))
@@ -338,7 +342,7 @@ public class CriticalTextAnalyzer {
             st_flag_c=0;
             
             tot_literal_string_count+= getNumStrings();
-//            System.out.println(tot_literal_string_count);
+            System.out.println(tot_literal_string_count);
             
             st_flag_c = prv_flag;
                  

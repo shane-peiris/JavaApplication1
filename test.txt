@@ -1,12 +1,17 @@
-shane "shane \"r\" peris" shane 'hi' /*sffs  shane ///sffsf "shane"
-hi
-hey
-hey*/
-hi 'hi' /*
-dsfsdf
-sdf
-sdf
-dsfds
-fdsf*/ jjij 'hi' "jo" ///dsfdsfds "hi" /*dfsf
-
-dsfdsf
+ //Display final total count of Alphanumeric Tokens
+        System.out.println("\nTotal count of Alphanumeric Tokens (without comments and literal strings) : " + (tot_alpha_word_count-alpha_string_count_for_line));
+        System.out.println("\nTotal count of Literal Strings : " + tot_literal_string_count);
+        System.out.println("\nThe list of Literal Strings : ");
+        
+        for (int l=0;l<literal_strings.size();l++)
+        {
+            System.out.println( String.valueOf(l+1) + ". \"" + literal_strings.elementAt(l)+"\"");
+        }
+        
+        System.out.println("\n***************************************************************\n");
+        }
+        catch(Exception e)
+        {
+                System.out.println("Error..!! Unable to read line..!!" 
+                + e.getMessage()+"\n");                      
+        }
