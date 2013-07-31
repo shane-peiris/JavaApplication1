@@ -259,6 +259,7 @@ public class CriticalTextAnalyzer {
                  {
                      //Increament token count found in current line
                       alph_word_count_for_line += 1;
+                      System.out.println(word);
                       
                  }                         
              }    
@@ -283,16 +284,16 @@ public class CriticalTextAnalyzer {
         {
             word = splitter.nextToken();
             
-            int ret = check_comment(word);
-            
-            if (ret==0)   
-            {
-                break;   
-            }
-            else if(ret==1)
-            {
-                continue;
-            }
+//            int ret = check_comment(word);
+//            
+//            if (ret==0)   
+//            {
+//                break;   
+//            }
+//            else if(ret==1)
+//            {
+//                continue;
+//            }
             
             int ret2 = check_literal_strings(word);
             
@@ -327,26 +328,28 @@ public class CriticalTextAnalyzer {
         {
             word = splitter.nextToken();
             
-            int ret = check_comment(word);
-            
-            if (ret==0)   
-            {
-                break;   
-            }
-            else if(ret==1)
-            {
-                continue;
-            }
+//            int ret = check_comment(word);
+//            
+//            if (ret==0)   
+//            {
+//                break;   
+//            }
+//            else if(ret==1)
+//            {
+//                continue;
+//            }
             
             int ret2 = check_literal_strings(word);
             
             if (ret2 == 0)
             {
                 cur_lit_string+=  word;
+                System.out.println("***************"+word+"******************");
             }
             else if (ret2 ==1)
             {
                 curr_literal_strings.add(cur_lit_string);
+                
                 cur_lit_string = "";                
             }
         }
@@ -398,7 +401,7 @@ public class CriticalTextAnalyzer {
 //            
 //            fw_flag_c=0;
             
-            literal_strings = getStrings();
+            literal_strings.add(getStrings());
             
 //            st_flag_c = prv_flag;
             chk++;     
@@ -413,9 +416,15 @@ public class CriticalTextAnalyzer {
         System.out.println("\nTotal count of Literal Strings : " + tot_literal_string_count);
         System.out.println("\nThe list of Literal Strings : ");
         
+        int count=1;
+        
         for (int l=0;l<literal_strings.size();l++)
         {
-            System.out.println( String.valueOf(l+1) + ". \"" + literal_strings.elementAt(l)+"\"");
+                if(!(literal_strings.elementAt(l).toString().equals("[]")))
+                { 
+                    System.out.println( String.valueOf(count) + ". \"" + literal_strings.elementAt(l)+"\"");
+                    count++;
+                }
         }
         
         System.out.println("\n***************************************************************\n");

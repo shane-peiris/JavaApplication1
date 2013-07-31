@@ -261,7 +261,7 @@ public class CriticalTextAnalyzer {
             if (ret2 == 0)
             {
                
-                if(Character.isLetter(word.charAt(0)))                    
+                if(Character.isLetter(word.charAt(0)))                 
                 alpha_string_count_for_line+= 1;
             }
             else if (ret2 ==1)
