@@ -112,6 +112,15 @@ public class CriticalTextAnalyzer {
              return 2;
     }
     
+       public int check_comment_new()
+               
+    {
+        
+         line = (line.replaceAll("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)",""));
+        
+        return 0;
+    }
+    
     public int check_literal_strings(String word)
     {
         //int ret=0;
@@ -171,28 +180,76 @@ public class CriticalTextAnalyzer {
     
     public int getNumTokens()
     {           
-        StringTokenizer splitter = new StringTokenizer(line, delims, true);
+         String new_line="";
+        //New Comment Remover Start            
+            
+            
+            
+            
+            new_line = line.replace("\\\"", "");
+                
+            new_line = (new_line.replaceAll("\"([^\"]*)\"", ""));
+             
+            new_line = (new_line.replaceAll("\'([^\"]*)\'", ""));
+        //New Comment Remover End
+        
+        StringTokenizer splitter = new StringTokenizer(new_line, delims, true);
         int numTokens = splitter.countTokens();        
         
         String word="";
         //Variable to hold the total alphanumeric token count in the line read
-        int alph_word_count_for_line = 0; 
+        int alph_word_count_for_line = 0;        
         
         for(int i=0;i<numTokens;i++)
         {    
             //Read next token in current line
             word = splitter.nextToken();
-                   
-            int ret = check_comment(word);
+    
+           //Old Comment Remover Start
             
-            if (ret==0)   
-            {
-                break;   
-            }
-            else if(ret==1)
-            {
-                continue;
-            }
+//            int ret = check_comment(word);
+//            
+//            if (ret==0)   
+//            {
+//                break;   
+//            }
+//            else if(ret==1)
+//            {
+//                continue;
+//            }
+            
+            
+            //Old Coment Remover End
+            
+            
+                    //New Complex Comment Handler END            
+            
+                     if ((word.charAt(0)=='/') &(fw_flag_c==0))
+                    {
+                        fw_flag_c=1;
+                        continue;
+                    }
+                    if ((word.charAt(0)=='*') &(fw_flag_c==1))
+                    {
+                        fw_flag_c=2;
+                        continue;
+                    }
+                    if ((word.charAt(0)=='*') &(fw_flag_c==2))
+                    {
+                        fw_flag_c=3;
+                        continue;
+                    }
+                    if ((word.charAt(0)=='/') &(fw_flag_c==3))
+                    {
+                        fw_flag_c=0;
+                        continue;
+                    }
+                    
+                    if ((fw_flag_c==2)|(fw_flag_c==3))
+                        continue;
+                    
+                    //New Complex Comment Handler END
+            
             
              //Checks whether the first character is either a letter or an underscore
              if (Character.isLetter(word.charAt(0)) || word.charAt(0) == '_')
@@ -207,7 +264,7 @@ public class CriticalTextAnalyzer {
              }    
         }       
         //return alphanumeric token count of current line
-        fw_flag_c=0;
+        //fw_flag_c=0;
         return alph_word_count_for_line;
         
     }
@@ -310,38 +367,40 @@ public class CriticalTextAnalyzer {
         
         while ((line = bufferReader.readLine()) != null)   
         {   
-                       
-             fw_flag_c=0;
-             if((st_flag_c!=2) & (st_flag_c<=2))
-                st_flag_c=0;
-             else if((st_flag_c!=3)&(st_flag_c>2))
-                st_flag_c=0;
+             
+            check_comment_new();
+            
+//             fw_flag_c=0;
+//             if((st_flag_c!=2) & (st_flag_c<=2))
+//                st_flag_c=0;
+//             else if((st_flag_c!=3)&(st_flag_c>2))
+//                st_flag_c=0;
             
             tot_alpha_word_count+= getNumTokens();
 
-            prv_flag = st_flag_c;
-        
-           
-            if (chk==0)             
-                st_flag_c=0;
-            
-            fw_flag_c=0;
+//            prv_flag = st_flag_c;
+//        
+//           
+//            if (chk==0)             
+//                st_flag_c=0;
+//            
+//            fw_flag_c=0;
             
             
             tot_literal_string_count+= getNumStrings();
             
-            prv_flag = st_flag_c;
-           
-
-            
-            if (chk==0)
-                st_flag_c=0;
-            
-            fw_flag_c=0;
+//            prv_flag = st_flag_c;
+//           
+//
+//            
+//            if (chk==0)
+//                st_flag_c=0;
+//            
+//            fw_flag_c=0;
             
             literal_strings = getStrings();
             
-            st_flag_c = prv_flag;
+//            st_flag_c = prv_flag;
             chk++;     
             
         } 
@@ -350,7 +409,7 @@ public class CriticalTextAnalyzer {
         bufferReader.close();
         
         //Display final total count of Alphanumeric Tokens
-        System.out.println("\nTotal count of Alphanumeric Tokens (without comments and literal strings) : " + (tot_alpha_word_count-alpha_string_count_for_line));
+        System.out.println("\nTotal count of Alphanumeric Tokens (without comments and literal strings) : " + (tot_alpha_word_count));
         System.out.println("\nTotal count of Literal Strings : " + tot_literal_string_count);
         System.out.println("\nThe list of Literal Strings : ");
         
@@ -372,28 +431,28 @@ public class CriticalTextAnalyzer {
     public static void main(String args[])
     {
         
-//         CriticalTextAnalyzer c = new CriticalTextAnalyzer("test.txt");  
-//         c.read_file_contents();       
+         CriticalTextAnalyzer c = new CriticalTextAnalyzer("test.txt");  
+         c.read_file_contents();       
         
         
-        System.out.println("\n******************Critical Text Analyzer***********************\n");
-        String path="";
-        do{
-            System.out.print("Please enter file name in the current directory to anaylse : ");
-            //Get file path directory from user
-            path = System.console().readLine();
-
-            if (path.equals(""))
-            {
-                System.out.println("\nNo input found\n");                
-            }
-            else
-            {
-                //Create new object of class along with passing the file path
-                CriticalTextAnalyzer c = new CriticalTextAnalyzer(path);  
-                c.read_file_contents();                
-            }
-        }while(path.equals(""));
+//        System.out.println("\n******************Critical Text Analyzer***********************\n");
+//        String path="";
+//        do{
+//            System.out.print("Please enter file name in the current directory to anaylse : ");
+//            //Get file path directory from user
+//            path = System.console().readLine();
+//
+//            if (path.equals(""))
+//            {
+//                System.out.println("\nNo input found\n");                
+//            }
+//            else
+//            {
+//                //Create new object of class along with passing the file path
+//                CriticalTextAnalyzer c = new CriticalTextAnalyzer(path);  
+//                c.read_file_contents();                
+//            }
+//        }while(path.equals(""));
 //          
     }
 }

@@ -112,6 +112,11 @@ public class CriticalTextAnalyzer {
              return 2;
     }
     
+    public int check_comment_new()
+    {
+        return 0;
+    }
+    
     public int check_literal_strings(String word)
     {
         //int ret=0;
@@ -180,19 +185,33 @@ public class CriticalTextAnalyzer {
         
         for(int i=0;i<numTokens;i++)
         {    
+            //New Comment remover Start
+            
+            
+            
+            //New commetn Remover End
+            
+            
+            
+            
+            
             //Read next token in current line
             word = splitter.nextToken();
                    
-            int ret = check_comment(word);
+            //Old Comment Remove Start
             
-            if (ret==0)   
-            {
-                break;   
-            }
-            else if(ret==1)
-            {
-                continue;
-            }
+//            int ret = check_comment(word);
+//            
+//            if (ret==0)   
+//            {
+//                break;   
+//            }
+//            else if(ret==1)
+//            {
+//                continue;
+//            }
+            
+             //Old Comment Remove End
             
              //Checks whether the first character is either a letter or an underscore
              if (Character.isLetter(word.charAt(0)) || word.charAt(0) == '_')
