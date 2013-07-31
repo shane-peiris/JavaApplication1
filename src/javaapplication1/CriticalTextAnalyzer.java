@@ -244,7 +244,7 @@ public class CriticalTextAnalyzer {
                         fw_flag_c=0;
                         continue;
                     }
-                    
+                     
                     if ((fw_flag_c==2)|(fw_flag_c==3))
                         continue;
                     
