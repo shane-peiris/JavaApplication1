@@ -1,5 +1,4 @@
-package javaapplication1;
-/**
+/*
  *
  * @author Shane
  */
@@ -11,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class CriticalTextAnalyzer {
+public class CriticalTextAnalyzer_ass3 {
 
     //Variable to hold the file path
     public static String file_path="";
@@ -47,7 +46,7 @@ public class CriticalTextAnalyzer {
     public Vector literal_strings = new Vector<Object>();
     
     
-    CriticalTextAnalyzer(String u_file_path) 
+    CriticalTextAnalyzer_ass3(String u_file_path) 
     {
         //Intializes file path sent while object creationg to the variable file_path
         file_path=u_file_path;        
@@ -250,6 +249,7 @@ public class CriticalTextAnalyzer {
                  {
                      //Increament token count found in current line
                       alph_word_count_for_line += 1;
+                      System.out.println(word);
                       
                  }                         
              }    
@@ -337,6 +337,7 @@ public class CriticalTextAnalyzer {
         Matcher m = p.matcher(proc_line);
         while (m.find()) {
             comma_seps.add(m.group(1));
+            System.out.println(m.group(1));
             multi++;
         }
         
@@ -394,23 +395,6 @@ public class CriticalTextAnalyzer {
         
     }
     
-    public int getNumIntVariables()
-    {return int_var_count;}
-    public int getNumBooleanVariables()
-    {return boolean_var_count;}
-    public int getNumCharVariables()
-    {return char_var_count;}
-    public int getNumDoubleVariables()
-    {return double_var_count;}
-    public int getNumFloatVariables()
-    {return float_var_count;}
-    public int getNumByteVariables()
-    {return byte_var_count;}
-    public int getNumShortVariables()
-    {return short_var_count;}
-    public int getNumLongVariables()
-    {return long_var_count;}
-    
     public void read_file_contents()
     {
          try{
@@ -425,11 +409,11 @@ public class CriticalTextAnalyzer {
              
             check_comment_new();
                         
-            tot_alpha_word_count+= getNumTokens();
-          
-            tot_literal_string_count+= getNumStrings();
-            
-            literal_strings.add(getStrings());
+//            tot_alpha_word_count+= getNumTokens();
+//          
+//            tot_literal_string_count+= getNumStrings();
+//            
+//            literal_strings.add(getStrings());
             
             identify_variable();
         } 
@@ -453,14 +437,7 @@ public class CriticalTextAnalyzer {
                 }
         }
         
-        System.out.println("\nTotal int variable count " + getNumIntVariables());
-        System.out.println("\nTotal boolean variable count " + getNumBooleanVariables());
-        System.out.println("\nTotal char variable count " + getNumCharVariables());
-        System.out.println("\nTotal double variable count " + getNumDoubleVariables());
-        System.out.println("\nTotal float variable count " + getNumFloatVariables());
-        System.out.println("\nTotal byte variable count " + getNumByteVariables());
-        System.out.println("\nTotal short variable count " + getNumShortVariables());
-        System.out.println("\nTotal long variable count " + getNumLongVariables());
+        System.out.println("\nTotal int variable count " + int_var_count);
         
         
         
@@ -478,7 +455,7 @@ public class CriticalTextAnalyzer {
     public static void main(String args[])
     {
         
-         CriticalTextAnalyzer c = new CriticalTextAnalyzer("test.txt");  
+         CriticalTextAnalyzer_ass3 c = new CriticalTextAnalyzer_ass3("test.txt");  
          c.read_file_contents();       
         
         

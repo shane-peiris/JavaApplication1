@@ -1,31 +1,11 @@
-package javaapplication1;
-/**
- *
- * @author Shane
- */
-
-import java.io.*;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-
-public class CriticalTextAnalyzer {
-
-    //Variable to hold the file path
-    public static String file_path="";
-    //Variable to hold the one line data
-    public static String line="";
-    //Variable to hold the total alphanumeric token count
-    public static int tot_alpha_word_count=0;
-    //Variable to hold the total literal string count
-    public static int tot_literal_string_count=0;
-    
-    public String delims = "\t\n,;{}[]().-<>&^%$@!-+\\/*'~\"= ";
-    
-    //Comment Flag Variables
-    int fw_flag_c=0;
+    int tcount = 0, acount = 0, numTokens = 0;
     int st_flag_c=0;
     
-    int flag_1=0;
-    int flag_2=0;
+    boolean flag_1=0;
+    float flag_2=0;
     int flag_3=0;
+    
+   
+    int alpha_string_count_for_line = 0; 
+
+	for (int i=0;i<semi_seps.size();i++)
