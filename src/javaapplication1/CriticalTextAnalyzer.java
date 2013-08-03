@@ -41,6 +41,8 @@ public class CriticalTextAnalyzer {
     public int float_var_count=0;
     public int boolean_var_count=0;
     
+    public int var_flag=0;
+    
    
     int alpha_string_count_for_line = 0; 
     
@@ -53,7 +55,7 @@ public class CriticalTextAnalyzer {
         file_path=u_file_path;        
     }  
     
-    public int check_comment(String word)
+    public int check_comment_old(String word)
     {
         int ret=0;
         
@@ -376,22 +378,37 @@ public class CriticalTextAnalyzer {
         Vector semi_seps = new Vector<Object>();
         
 //        System.out.println("*******Line Semi Break************");  
-        String pat="(.*?);";                
-        Pattern p = Pattern.compile(pat);
-        Matcher m = p.matcher(cur_line);
-        while (m.find()) {
-            semi_seps.add(m.group(1));
-//            System.out.println(m.group(1));
-            
-        }
-//        System.out.println("**********************************\n");
         
-        for (int i=0;i<semi_seps.size();i++)
+            String pat="(.*?);";                
+            Pattern p = Pattern.compile(pat);
+            Matcher m = p.matcher(cur_line);
+            while (m.find()) {
+                semi_seps.add(m.group(1));
+    //            System.out.println(m.group(1));
+                var_flag=0;
+            }
+    //        System.out.println("**********************************\n");
+        
+        if( semi_seps.size()<=0)
         {
-           add_variable_type(semi_seps.elementAt(i).toString());
+            //System.out.println("comma");
+            if((cur_line.substring((cur_line.length())-1)).equals(","))
+            {
+                //System.out.println(cur_line);
+                //System.out.println("comma2");
+                var_flag = 1;
+                add_variable_type(cur_line);
+            }
         }
-        
-        
+        else
+        {        
+            for (int i=0;i<semi_seps.size();i++)
+            {
+              //System.out.println(cur_line); 
+                //System.out.println("semi");
+               add_variable_type(semi_seps.elementAt(i).toString());
+            }
+        }
     }
     
     public int getNumIntVariables()
@@ -440,9 +457,14 @@ public class CriticalTextAnalyzer {
         //Display final total count of Alphanumeric Tokens
         System.out.println("\nTotal count of Alphanumeric Tokens (without comments and literal strings) : " + (tot_alpha_word_count));
         System.out.println("\nTotal count of Literal Strings : " + tot_literal_string_count);
-        System.out.println("\nThe list of Literal Strings : ");
+        
         
         int count=1;
+        
+        if(tot_literal_string_count>0)
+        {
+            System.out.println("\nThe list of Literal Strings : ");
+        }
         
         for (int l=0;l<literal_strings.size();l++)
         {
