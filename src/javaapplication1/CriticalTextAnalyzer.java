@@ -24,6 +24,7 @@ public class CriticalTextAnalyzer {
     
     public String delims = "\t\n,;{}[]().-<>&^%$@!-+\\/*'~\"= ";
     
+    public int line_count=0;
     //Comment Flag Variables
     int fw_flag_c=0;
     int st_flag_c=0;
@@ -31,6 +32,7 @@ public class CriticalTextAnalyzer {
     int flag_1=0;
     int flag_2=0;
     int flag_3=0;
+    
     
     public int int_var_count=0;
     public int char_var_count=0;
@@ -42,6 +44,8 @@ public class CriticalTextAnalyzer {
     public int boolean_var_count=0;
     
     public int var_flag=0;
+    
+    public String last_var_type="";
     
    
     int alpha_string_count_for_line = 0; 
@@ -330,7 +334,14 @@ public class CriticalTextAnalyzer {
     {
         String var_type="";
         int comma_count=1;
-        int multi=1;
+        int multi;
+        
+        if(var_flag==1 & line_count==0)
+            multi=1;
+        else if(var_flag==1)
+            multi=0;
+        else
+            multi=1;
         
         //Vector comma_seps = new Vector<Object>();
         
@@ -344,24 +355,66 @@ public class CriticalTextAnalyzer {
         
         if (multi>1)
             comma_count = comma_count * (multi);        
-            
-        
-        if(proc_line.matches("(.*?)int (.*?)"))
-                int_var_count = int_var_count + comma_count;
-        else if(proc_line.matches("(.*?)char (.*?)"))
-                char_var_count = char_var_count + comma_count;
-        else if(proc_line.matches("(.*?)byte (.*?)"))
-                byte_var_count = byte_var_count + comma_count;
-        else if(proc_line.matches("(.*?)short (.*?)"))
-                short_var_count = short_var_count + comma_count;
-        else if(proc_line.matches("(.*?)long (.*?)"))
-                long_var_count = long_var_count + comma_count;
-        else if(proc_line.matches("(.*?)double (.*?)"))
-                double_var_count = double_var_count + comma_count;
-        else if(proc_line.matches("(.*?)float (.*?)"))
-                float_var_count = float_var_count + comma_count;
-        else if(proc_line.matches("(.*?)boolean (.*?)"))
-                boolean_var_count = boolean_var_count + comma_count;
+         
+        if(var_flag==1 & line_count!=0)
+        {
+//            if(proc_line.matches("(.*?)"+ last_var_type +" (.*?)"))
+//            {
+                switch(last_var_type) {
+                    case "int":
+                        int_var_count = int_var_count + comma_count;
+                        break;
+                    case "char":
+                        char_var_count = char_var_count + comma_count;
+                        break;
+                    case "byte":
+                        short_var_count = short_var_count + comma_count;
+                        break;
+                    case "short":
+                        char_var_count = char_var_count + comma_count;
+                        break;
+                    case "long":
+                        long_var_count = long_var_count + comma_count;
+                        break;
+                    case "double":
+                        double_var_count = double_var_count + comma_count;
+                        break;
+                    case "float":
+                        float_var_count = float_var_count + comma_count;
+                        break;
+                    case "boolean":
+                        boolean_var_count = boolean_var_count + comma_count;
+                        break;
+                }
+            //}
+        }
+        else
+        {
+            if(proc_line.matches("(.*?)int (.*?)")){
+                    int_var_count = int_var_count + comma_count;
+                    last_var_type="int";}
+            else if(proc_line.matches("(.*?)char (.*?)")){
+                    char_var_count = char_var_count + comma_count;
+                    last_var_type="char";}
+            else if(proc_line.matches("(.*?)byte (.*?)")){
+                    byte_var_count = byte_var_count + comma_count;
+                    last_var_type="byte";}
+            else if(proc_line.matches("(.*?)short (.*?)")){
+                    short_var_count = short_var_count + comma_count;
+                    last_var_type="short";}
+            else if(proc_line.matches("(.*?)long (.*?)")){
+                    long_var_count = long_var_count + comma_count;
+                    last_var_type="long";}
+            else if(proc_line.matches("(.*?)double (.*?)")){
+                    double_var_count = double_var_count + comma_count;
+                    last_var_type="double";}
+            else if(proc_line.matches("(.*?)float (.*?)")){
+                    float_var_count = float_var_count + comma_count;
+                    last_var_type="float";}
+            else if(proc_line.matches("(.*?)boolean (.*?)")){
+                    boolean_var_count = boolean_var_count + comma_count;
+                    last_var_type="boolean";}
+        }
     }
     
     public void identify_variable()
@@ -370,15 +423,36 @@ public class CriticalTextAnalyzer {
         cur_line = cur_line.replace("public", "");
         cur_line = cur_line.replace("protected", "");
         cur_line = cur_line.replace("private", "");
+        cur_line = cur_line.trim().replace(",\\s+", ",");
         
 //        System.out.println("*******Line Without public/private/protected************");
 //        System.out.println(cur_line);
 //        System.out.println("********************************************************\n");
+        try
+        {
+            if(cur_line.matches("(.*?)\\((.*?)\\)(.*?)") & (!(cur_line.substring(0, 3).equals("for"))))
+            {
+               System.out.println(cur_line);
+               add_variable_type(cur_line);
+            }
+        }
+        catch(Exception ex){}
         
         Vector semi_seps = new Vector<Object>();
-        
+        try
+        {
+        if((cur_line.substring((cur_line.length())-1)).equals(","))
+                {
+                    //System.out.println(cur_line);
+                    //System.out.println("comma2");
+                    var_flag = 1;
+                    
+                }
+        }
+        catch(Exception ex){}
 //        System.out.println("*******Line Semi Break************");  
-        
+        if (var_flag!=1)
+        {
             String pat="(.*?);";                
             Pattern p = Pattern.compile(pat);
             Matcher m = p.matcher(cur_line);
@@ -388,12 +462,38 @@ public class CriticalTextAnalyzer {
                 var_flag=0;
             }
     //        System.out.println("**********************************\n");
-        
+        }
+        else
+        {
+            int count=0;
+            
+            String pat="(.*?);";                
+            Pattern p = Pattern.compile(pat);
+            Matcher m = p.matcher(cur_line);
+            while (m.find()) {
+                if (count!=0)
+                {
+                    semi_seps.add(m.group(1));
+     //             System.out.println(m.group(1));
+                    var_flag=0;
+                }
+                else
+                {
+                    add_variable_type(m.group(1));
+                }
+                
+                count++;
+            }
+            
+                    
+        }
+            
         if( semi_seps.size()<=0)
         {
             //System.out.println("comma");
             try
             {
+                
                 if((cur_line.substring((cur_line.length())-1)).equals(","))
                 {
                     //System.out.println(cur_line);
@@ -445,7 +545,7 @@ public class CriticalTextAnalyzer {
         
         while ((line = bufferReader.readLine()) != null)   
         {   
-             
+            
             check_comment_new();
                         
             tot_alpha_word_count+= getNumTokens();
@@ -455,6 +555,7 @@ public class CriticalTextAnalyzer {
             literal_strings.add(getStrings());
             
             identify_variable();
+            line_count++;
         } 
         
         //Close the buffer reader
