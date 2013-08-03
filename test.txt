@@ -1,4 +1,4 @@
-    int tcount = 0, acount = 0, numTokens = 0;
+int tcount = 0, acount = 0, numTokens = 0;
     int st_flag_c=0;
     
     boolean flag_1=0;
@@ -8,4 +8,6 @@
    
     int alpha_string_count_for_line = 0; 
 
-	for (int i=0;i<semi_seps.size();i++)
+ for ( int l=0;l<literal_strings.size();l++)
+public int getNumIntVariables()
+    {return float_var_count;}
