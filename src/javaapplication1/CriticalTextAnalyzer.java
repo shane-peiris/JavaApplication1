@@ -431,9 +431,21 @@ public class CriticalTextAnalyzer {
         try
         {
             if(cur_line.matches("(.*?)\\((.*?)\\)(.*?)") & (!(cur_line.substring(0, 3).equals("for"))))
-            {
-               System.out.println(cur_line);
-               add_variable_type(cur_line);
+            {               
+                cur_line = cur_line.replaceAll("\\)", ",\\)");
+                System.out.println(cur_line);
+                String pat="(.*?),(.*?)";                
+                Pattern p = Pattern.compile(pat);
+                Matcher m = p.matcher(cur_line.substring((cur_line.indexOf("("))+1));
+                while (m.find()) {
+                    //semi_seps.add(m.group(1));
+        // System.out.println(m.group(1));
+                   // var_flag=0;
+                   System.out.println(m.group(1));
+                   add_variable_type(m.group(1));
+                    
+                }
+               
             }
         }
         catch(Exception ex){}
