@@ -1,4 +1,4 @@
-package javaapplication1;
+
 /**
  *
  * @author Shane
@@ -10,24 +10,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class ClassDefinition
-{
-    
-    public Vector interf_names = new Vector<Object>(); 
-    
-    public String getParentClassName()
-    {
-    
-        return "";
-    }
-    
-    public Vector getInterfaceNames()
-    {
-    
-        return interf_names;
-    }
-}
-public class CriticalTextAnalyzer {
+
+public class CriticalTextAnalyzer3f {
 
     //Variable to hold the file path
     public static String file_path="";
@@ -68,35 +52,12 @@ public class CriticalTextAnalyzer {
     
     public Vector literal_strings = new Vector<Object>();
     
-    public Vector file_class_Details = new Vector<Object>();
     
-    
-    CriticalTextAnalyzer(String u_file_path) 
+    CriticalTextAnalyzer3f(String u_file_path) 
     {
         //Intializes file path sent while object creationg to the variable file_path
         file_path=u_file_path;        
     }  
-    
-    public Vector getClassDefinitions()
-    {
-        Vector chk_class_details = new Vector<Object>();
-        
-        String cur_line = line;
-        
-        cur_line = cur_line.replace("public", "");
-        cur_line = cur_line.replace("protected", "");
-        cur_line = cur_line.replace("private", "");
-        
-        
-        if(cur_line.matches(line))
-        {
-                        
-        }
-        
-        
-        
-        return chk_class_details;
-    }
     
     public int check_comment_old(String word)
     {
@@ -599,16 +560,13 @@ public class CriticalTextAnalyzer {
             
             check_comment_new();
                         
-            //tot_alpha_word_count+= getNumTokens();
+            tot_alpha_word_count+= getNumTokens();
           
-            //tot_literal_string_count+= getNumStrings();
+            tot_literal_string_count+= getNumStrings();
             
-            //literal_strings.add(getStrings());
+            literal_strings.add(getStrings());
             
-            //identify_variable();
-            
-            file_class_Details.add(getClassDefinitions());
-            
+            identify_variable();
             line_count++;
         } 
         
@@ -661,7 +619,7 @@ public class CriticalTextAnalyzer {
     public static void main(String args[])
     {
         
-         CriticalTextAnalyzer c = new CriticalTextAnalyzer("test.txt");  
+         CriticalTextAnalyzer3f c = new CriticalTextAnalyzer3f("test.txt");  
          c.read_file_contents();       
         
         
@@ -686,4 +644,3 @@ public class CriticalTextAnalyzer {
 //          
     }
 }
-
