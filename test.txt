@@ -1,2 +1,4 @@
-public int getNumIntVariables(int shane,int xx)
-    {return int_var_count;}
+class B implements A,C
+{
+
+}

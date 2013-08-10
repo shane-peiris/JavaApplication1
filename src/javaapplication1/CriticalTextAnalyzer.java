@@ -9,16 +9,20 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import sun.org.mozilla.javascript.internal.Evaluator;
+import sun.org.mozilla.javascript.internal.regexp.SubString;
 
 class ClassDefinition
 {
     
     public Vector interf_names = new Vector<Object>(); 
+    public String parent_class="";
+    public String class_name="";
     
     public String getParentClassName()
     {
     
-        return "";
+        return parent_class;
     }
     
     public Vector getInterfaceNames()
@@ -27,7 +31,7 @@ class ClassDefinition
         return interf_names;
     }
 }
-public class CriticalTextAnalyzer {
+public class CriticalTextAnalyzer extends ClassDefinition{
 
     //Variable to hold the file path
     public static String file_path="";
@@ -49,6 +53,8 @@ public class CriticalTextAnalyzer {
     int flag_2=0;
     int flag_3=0;
     
+    int file_line_count=0;
+    
     
     public int int_var_count=0;
     public int char_var_count=0;
@@ -69,7 +75,11 @@ public class CriticalTextAnalyzer {
     public Vector literal_strings = new Vector<Object>();
     
     public Vector file_class_Details = new Vector<Object>();
+    public String class_def_id = "1";
     
+    public int cd_count=0;
+    
+    ClassDefinition[] cd;
     
     CriticalTextAnalyzer(String u_file_path) 
     {
@@ -82,92 +92,89 @@ public class CriticalTextAnalyzer {
         Vector chk_class_details = new Vector<Object>();
         
         String cur_line = line;
+        String cur_class_name="";
         
         cur_line = cur_line.replace("public", "");
         cur_line = cur_line.replace("protected", "");
         cur_line = cur_line.replace("private", "");
         
         
-        if(cur_line.matches(line))
+        //Test Start
+        
+        //ClassDefinition cs = new ClassDefinition();
+        //cs.s = "shane";
+        
+        //System.out.println(cs.getParentClassName());
+        
+        //Test End
+        if(cur_line.matches("class (.*?)"))
         {
-                        
+            cur_class_name= cur_line.substring(6,cur_line.indexOf(" ", 6));
+            chk_class_details.add("CN - " + cur_class_name);
+            //cd[cd_count] = new ClassDefinition();
+            
         }
         
+        
+        if(cur_line.matches("class (.*?) extends (.*?)"))
+        {
+            cur_class_name= cur_line.substring(6, cur_line.indexOf("extends"));
+            //System.out.println(cur_class_name); 
+            //ClassDefinition <cur_class_name> = new ClassDefinition();
+            chk_class_details.add("PC - " + cur_class_name);
+            chk_class_details.add("I - " + " ");
+            chk_class_details.add("O - " + " ");
+            //cd[cd_count].parent_class = cur_class_name;
+            //System.out.println("extend");     
+            //System.out.println( cd[cd_count].parent_class);
+        }
+        else if(cur_line.matches("class (.*?) implements (.*?)"))
+        {
+            cur_class_name= cur_line.substring(6, cur_line.indexOf("implements"));
+            //System.out.println(cur_class_name); 
+            //System.out.println("implement");     
+            
+            cur_line = cur_line.replace("class", "");
+            cur_line = cur_line.replace("implements", "");
+            cur_line = cur_line.replace(cur_class_name, "");
+            cur_line = cur_line.replace(" ", "");
+            
+            chk_class_details.add("PC - " + " ");
+            
+            //System.out.println(cur_line); 
+            
+            String[] interfaces=cur_line.split(",");
+            
+            for (int i=0; i<interfaces.length;i++)
+            {
+                chk_class_details.add("I - " + interfaces[i]);
+                //cd[cd_count].interf_names.add(interfaces[i]);
+                //System.out.println(interfaces[i]); 
+            }
+            //cd[cd_count].interf_names = chk_class_details;
+//            for (int c=0; c<interfaces.length;c++)
+//            {
+//                System.out.println(cd[cd_count].interf_names.elementAt(c)); 
+//            }
+            chk_class_details.add("O - " + " ");
+            
+        }
+        else if(cur_line.matches("class (.*?)"))
+        {
+            
+            cur_class_name= cur_line.substring(6);
+            //System.out.println(cur_class_name); 
+            //System.out.println("normal");  
+            chk_class_details.add("PC - " + " ");
+            chk_class_details.add("I - " + " ");
+            chk_class_details.add("O - Object");
+        }
+        //cd_count++;
         
         
         return chk_class_details;
     }
-    
-    public int check_comment_old(String word)
-    {
-        int ret=0;
-        
-            if(fw_flag_c==2)
-            {
-                ret = 0;
-                return ret;
-            }   
-            else if((st_flag_c==3) & !(word.charAt(0) == '/'))
-            {
-                     st_flag_c=2;
-                     ret = 1;
-                     return ret;
-            }
-            else if(!((word.charAt(0) == '*')|(word.charAt(0) == '/')))
-            {              
-                if((st_flag_c==2) |(st_flag_c==3))
-                {
-                    ret = 1;
-                    return ret;
-                }
-            } 
-             if ((word.charAt(0) == '/') & ((fw_flag_c==0)&(st_flag_c==0)))
-             {
-                    fw_flag_c += 1;
-                    st_flag_c += 1;
-                    ret = 1;
-                    return ret;
-             }
-             else
-             {
-                 if((fw_flag_c==1)|(st_flag_c==1))
-                 {
-                     if(word.charAt(0) == '/')
-                     {
-                        fw_flag_c += 1;
-                        ret = 1;
-                        return ret;
-                     }
-                     else if(word.charAt(0) == '*')
-                     {
-                        st_flag_c += 1;
-                        fw_flag_c = 0;
-                        ret = 1;
-                        return ret;
-                     }  
-                     else
-                     {
-                         st_flag_c = 0;
-                         fw_flag_c = 0;
-                     }
-                 } 
-                 else if((st_flag_c==2) &(word.charAt(0) == '*'))
-                 {
-                     st_flag_c+=1;
-                     ret = 1;
-                     return ret;
-                 }                 
-                 else if((st_flag_c==3) &(word.charAt(0) == '/'))
-                 {
-                     st_flag_c=0;
-                     ret = 1;
-                     return ret;
-                 }
-                 
-             }
-             return 2;
-    }
-    
+     
     public int check_comment_new()               
     {
         
@@ -589,15 +596,29 @@ public class CriticalTextAnalyzer {
     {
          try{
 
-        FileReader fileToRead = new FileReader(file_path);
-        //Instantiate the BufferedReader Class to read the file
-        BufferedReader bufferReader = new BufferedReader(fileToRead);        
+       
+        FileReader fileToRead_c = new FileReader(file_path);       
         // Read file line by line and print on the console
+        BufferedReader bufferReader_c = new BufferedReader(fileToRead_c);    
         
+        while (bufferReader_c.readLine() != null) file_line_count++;
+        
+        bufferReader_c.close();
+        
+        
+        
+        FileReader fileToRead = new FileReader(file_path);
+         //Instantiate the BufferedReader Class to read the file
+        BufferedReader bufferReader = new BufferedReader(fileToRead);
+        
+        cd = new ClassDefinition[file_line_count];
+        
+        int ele_id=0;
+                
         while ((line = bufferReader.readLine()) != null)   
         {   
             
-            check_comment_new();
+            //check_comment_new();
                         
             //tot_alpha_word_count+= getNumTokens();
           
@@ -607,8 +628,33 @@ public class CriticalTextAnalyzer {
             
             //identify_variable();
             
-            file_class_Details.add(getClassDefinitions());
+            file_class_Details = getClassDefinitions();
             
+            cd[cd_count] = new ClassDefinition();
+            
+            cd[cd_count].class_name = file_class_Details.elementAt(ele_id).toString().substring(5);
+            System.out.println(cd[cd_count].class_name );
+            
+            cd[cd_count].parent_class = file_class_Details.elementAt(ele_id+1).toString().substring(5);
+            System.out.println(cd[cd_count].parent_class );
+            
+            ele_id++;
+            
+            while((file_class_Details.elementAt(ele_id).toString().matches("I - ")))
+            {
+                cd[cd_count].interf_names.add(file_class_Details.elementAt(ele_id).toString().substring(4));
+                System.out.println(cd[cd_count].interf_names.size() );
+                ele_id++;
+            }
+            
+            if((cd[cd_count].parent_class).equals(""))
+            {
+                cd[cd_count].parent_class = file_class_Details.elementAt(ele_id).toString().substring(4);
+                System.out.println(cd[cd_count].parent_class );
+            }
+            
+            
+            cd_count++;
             line_count++;
         } 
         
