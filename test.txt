@@ -1,4 +1,19 @@
-class B implements A,C
-{
+public interface Monster {
 
+    public int getLevel();
+
+    public int level = 1;
+}
+
+public class Character {
+    public static class Gorgon extends Character implements Monster{
+        public int level;
+        @Override
+        public int getLevel() {return level;}
+
+                public Gorgon(){
+
+                 type = "Gorgon";
+        }
+    }
 }

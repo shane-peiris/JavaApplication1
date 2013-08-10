@@ -79,6 +79,7 @@ public class CriticalTextAnalyzer extends ClassDefinition{
     
     public int cd_count=0;
     
+    ClassDefinition[] cd_temp;
     ClassDefinition[] cd;
     
     CriticalTextAnalyzer(String u_file_path) 
@@ -97,6 +98,8 @@ public class CriticalTextAnalyzer extends ClassDefinition{
         cur_line = cur_line.replace("public", "");
         cur_line = cur_line.replace("protected", "");
         cur_line = cur_line.replace("private", "");
+        cur_line = cur_line.replace("static", "");
+        cur_line = cur_line.trim().replace(",\\s+", ",");
         
         
         //Test Start
@@ -109,24 +112,59 @@ public class CriticalTextAnalyzer extends ClassDefinition{
         //Test End
         if(cur_line.matches("class (.*?)"))
         {
+            try
+            {
             cur_class_name= cur_line.substring(6,cur_line.indexOf(" ", 6));
+            }
+            catch(Exception ex)
+            {
+            cur_class_name= cur_line.substring(6);
+            }
             chk_class_details.add("CN - " + cur_class_name);
             //cd[cd_count] = new ClassDefinition();
             
-        }
+        
         
         
         if(cur_line.matches("class (.*?) extends (.*?)"))
         {
-            cur_class_name= cur_line.substring(6, cur_line.indexOf("extends"));
-            //System.out.println(cur_class_name); 
-            //ClassDefinition <cur_class_name> = new ClassDefinition();
-            chk_class_details.add("PC - " + cur_class_name);
-            chk_class_details.add("I - " + " ");
-            chk_class_details.add("O - " + " ");
-            //cd[cd_count].parent_class = cur_class_name;
-            //System.out.println("extend");     
-            //System.out.println( cd[cd_count].parent_class);
+            
+            if(cur_line.matches("class (.*?) extends (.*?) implements (.*?)"))
+            {
+                    
+                //cur_class_name= cur_line.substring(6, cur_line.indexOf("implements"));                
+
+                cur_line = cur_line.replace("class", "");
+                //cur_line = cur_line.replace("implements", "");
+                cur_line = cur_line.replace(cur_class_name, "");
+                cur_line = cur_line.replace("{", "");
+                cur_line = cur_line.replace("}", "");
+
+                chk_class_details.add("PC - " + cur_line.substring(cur_line.indexOf("extends")+8,cur_line.indexOf("implements")));
+
+                String[] interfaces=cur_line.substring(cur_line.indexOf("implements")+11).split(",");
+
+                for (int i=0; i<interfaces.length;i++)
+                {
+                    chk_class_details.add("I - " + interfaces[i]);                    
+                }
+                
+                chk_class_details.add("O - " + " ");
+                
+                
+            }
+            else
+            {            
+                cur_class_name= cur_line.substring(cur_line.indexOf("extends")+8);
+                //System.out.println(cur_class_name); 
+                //ClassDefinition <cur_class_name> = new ClassDefinition();
+                chk_class_details.add("PC - " + cur_class_name);
+                chk_class_details.add("I - " + " ");
+                chk_class_details.add("O - " + " ");
+                //cd[cd_count].parent_class = cur_class_name;
+                //System.out.println("extend");     
+                //System.out.println( cd[cd_count].parent_class);
+            }
         }
         else if(cur_line.matches("class (.*?) implements (.*?)"))
         {
@@ -170,7 +208,11 @@ public class CriticalTextAnalyzer extends ClassDefinition{
             chk_class_details.add("O - Object");
         }
         //cd_count++;
-        
+        }
+        else
+        {
+            chk_class_details.add("CN - " + " ");
+        }
         
         return chk_class_details;
     }
@@ -592,6 +634,52 @@ public class CriticalTextAnalyzer extends ClassDefinition{
     public int getNumLongVariables()
     {return long_var_count;}
     
+    public void class_cat()
+    {
+        int ele_id=0;
+            if(!(file_class_Details.elementAt(ele_id).toString().substring(5)).equals(" "))
+            {
+                cd_temp[cd_count] = new ClassDefinition();
+
+                //Show Class Name
+
+                cd_temp[cd_count].class_name = file_class_Details.elementAt(ele_id).toString().substring(5);
+                System.out.println(file_class_Details.elementAt(ele_id).toString().substring(5) );
+
+                ele_id++;
+
+                //Show Parent Class
+
+                cd_temp[cd_count].parent_class = file_class_Details.elementAt(ele_id).toString().substring(5);
+                System.out.println(file_class_Details.elementAt(ele_id+1).toString().substring(5));
+
+                ele_id++;
+
+                while((file_class_Details.elementAt(ele_id).toString().contains("I - ")))
+                {
+                    cd_temp[cd_count].interf_names.add(file_class_Details.elementAt(ele_id).toString().substring(4));
+
+                    ele_id++;
+                }
+
+                //Show Elements in interfaces
+
+                System.out.println(cd_temp[cd_count].interf_names.size());
+
+
+
+                if((cd_temp[cd_count].parent_class).equals(""))
+                {
+                    cd_temp[cd_count].parent_class = file_class_Details.elementAt(ele_id).toString().substring(4);
+                    System.out.println(cd_temp[cd_count].parent_class );
+                }
+
+
+                cd_count++;
+            }
+    
+    }
+    
     public void read_file_contents()
     {
          try{
@@ -611,9 +699,8 @@ public class CriticalTextAnalyzer extends ClassDefinition{
          //Instantiate the BufferedReader Class to read the file
         BufferedReader bufferReader = new BufferedReader(fileToRead);
         
-        cd = new ClassDefinition[file_line_count];
-        
-        int ele_id=0;
+        cd_temp = new ClassDefinition[file_line_count];
+                
                 
         while ((line = bufferReader.readLine()) != null)   
         {   
@@ -629,35 +716,20 @@ public class CriticalTextAnalyzer extends ClassDefinition{
             //identify_variable();
             
             file_class_Details = getClassDefinitions();
-            
-            cd[cd_count] = new ClassDefinition();
-            
-            cd[cd_count].class_name = file_class_Details.elementAt(ele_id).toString().substring(5);
-            System.out.println(cd[cd_count].class_name );
-            
-            cd[cd_count].parent_class = file_class_Details.elementAt(ele_id+1).toString().substring(5);
-            System.out.println(cd[cd_count].parent_class );
-            
-            ele_id++;
-            
-            while((file_class_Details.elementAt(ele_id).toString().matches("I - ")))
-            {
-                cd[cd_count].interf_names.add(file_class_Details.elementAt(ele_id).toString().substring(4));
-                System.out.println(cd[cd_count].interf_names.size() );
-                ele_id++;
-            }
-            
-            if((cd[cd_count].parent_class).equals(""))
-            {
-                cd[cd_count].parent_class = file_class_Details.elementAt(ele_id).toString().substring(4);
-                System.out.println(cd[cd_count].parent_class );
-            }
+            class_cat();
             
             
-            cd_count++;
+            file_class_Details.removeAllElements();
             line_count++;
         } 
         
+//        cd = new ClassDefinition[cd_count];
+        
+//        for(int a=0;a<cd_count;a++)
+//        {
+//            cd[a]=cd_temp[a];
+//        
+//        }
         //Close the buffer reader
         bufferReader.close();
         
@@ -682,6 +754,8 @@ public class CriticalTextAnalyzer extends ClassDefinition{
                 }
         }
         
+        System.out.println("\n*********************Variable Details**************************\n");
+        
         System.out.println("\nTotal int variable count " + getNumIntVariables());
         System.out.println("\nTotal boolean variable count " + getNumBooleanVariables());
         System.out.println("\nTotal char variable count " + getNumCharVariables());
@@ -691,8 +765,34 @@ public class CriticalTextAnalyzer extends ClassDefinition{
         System.out.println("\nTotal short variable count " + getNumShortVariables());
         System.out.println("\nTotal long variable count " + getNumLongVariables());
         
+        System.out.println("\n*********************Class Details*****************************\n");
         
+        System.out.println("\nTotal Class count " + cd_count);
         
+        for(int a=0;a<cd_count;a++)
+        {
+            System.out.println("\nClass " + (a+1));
+            
+            System.out.println("\nClass Name : " + cd_temp[a].class_name);
+            
+            if(cd_temp[a].getParentClassName().equals(" "))
+                System.out.println("Parent Class : NULL");
+            else
+                System.out.println("Parent Class :" + cd_temp[a].getParentClassName());
+            
+            if((cd_temp[a].getInterfaceNames().size()==1) & (cd_temp[a].getInterfaceNames().elementAt(0).equals(" ")))
+                System.out.println("Interface : NULL");
+            else
+            {
+                System.out.println("Interface List");
+                
+                for(int z=0;z<cd_temp[a].getInterfaceNames().size();z++)
+                {
+                    System.out.println(" * " + cd_temp[a].getInterfaceNames().elementAt(z));
+                }
+            
+            }
+        }
         
         System.out.println("\n***************************************************************\n");
         }
