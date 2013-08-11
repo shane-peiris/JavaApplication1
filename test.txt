@@ -1,19 +1,14 @@
-public interface Monster {
-
-    public int getLevel();
-
-    public int level = 1;
-}
-
-public class Character {
-    public static class Gorgon extends Character implements Monster{
-        public int level;
-        @Override
-        public int getLevel() {return level;}
-
-                public Gorgon(){
-
-                 type = "Gorgon";
-        }
-    }
-}
+public interface D
+{}
+public interface E
+{}
+public class B
+{}
+public class A extends B
+{}
+public class C implements D
+{}
+public class F implements D,E,L,P
+{}
+public class G extends B implements D
+{}

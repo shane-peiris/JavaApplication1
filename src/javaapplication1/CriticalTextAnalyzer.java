@@ -13,21 +13,18 @@ import sun.org.mozilla.javascript.internal.Evaluator;
 import sun.org.mozilla.javascript.internal.regexp.SubString;
 
 class ClassDefinition
-{
-    
+{    
     public Vector interf_names = new Vector<Object>(); 
     public String parent_class="";
     public String class_name="";
     
     public String getParentClassName()
-    {
-    
+    {    
         return parent_class;
     }
     
     public Vector getInterfaceNames()
-    {
-    
+    {    
         return interf_names;
     }
 }
@@ -53,8 +50,7 @@ public class CriticalTextAnalyzer extends ClassDefinition{
     int flag_2=0;
     int flag_3=0;
     
-    int file_line_count=0;
-    
+    int file_line_count=0;    
     
     public int int_var_count=0;
     public int char_var_count=0;
@@ -79,8 +75,8 @@ public class CriticalTextAnalyzer extends ClassDefinition{
     
     public int cd_count=0;
     
-    ClassDefinition[] cd_temp;
-    ClassDefinition[] cd;
+    public static ClassDefinition[] cd_temp;
+   //ClassDefinition[] cd;
     
     CriticalTextAnalyzer(String u_file_path) 
     {
@@ -100,114 +96,76 @@ public class CriticalTextAnalyzer extends ClassDefinition{
         cur_line = cur_line.replace("private", "");
         cur_line = cur_line.replace("static", "");
         cur_line = cur_line.trim().replace(",\\s+", ",");
+        cur_line = cur_line.replace("{", "");
+        cur_line = cur_line.replace("}", "");        
         
-        
-        //Test Start
-        
-        //ClassDefinition cs = new ClassDefinition();
-        //cs.s = "shane";
-        
-        //System.out.println(cs.getParentClassName());
-        
-        //Test End
         if(cur_line.matches("class (.*?)"))
         {
             try
             {
-            cur_class_name= cur_line.substring(6,cur_line.indexOf(" ", 6));
+                cur_class_name= cur_line.substring(6,cur_line.indexOf(" ", 6));
             }
             catch(Exception ex)
             {
-            cur_class_name= cur_line.substring(6);
+                cur_class_name= cur_line.substring(6);
             }
             chk_class_details.add("CN - " + cur_class_name);
-            //cd[cd_count] = new ClassDefinition();
-            
         
-        
-        
-        if(cur_line.matches("class (.*?) extends (.*?)"))
-        {
-            
-            if(cur_line.matches("class (.*?) extends (.*?) implements (.*?)"))
+            if(cur_line.matches("class (.*?) extends (.*?)"))
             {
-                    
-                //cur_class_name= cur_line.substring(6, cur_line.indexOf("implements"));                
+                if(cur_line.matches("class (.*?) extends (.*?) implements (.*?)"))
+                {
+                    cur_line = cur_line.replace("class", "");
+                    cur_line = cur_line.replace(cur_class_name, "");
+
+                    chk_class_details.add("PC - " + cur_line.substring(cur_line.indexOf("extends")+8,cur_line.indexOf("implements")));
+
+                    String[] interfaces=cur_line.substring(cur_line.indexOf("implements")+11).split(",");
+
+                    for (int i=0; i<interfaces.length;i++)
+                    {
+                        chk_class_details.add("I - " + interfaces[i]);                    
+                    }
+
+                    chk_class_details.add("O - " + " ");
+                }
+                else
+                {            
+                    cur_class_name= cur_line.substring(cur_line.indexOf("extends")+8);
+
+                    chk_class_details.add("PC - " + cur_class_name);
+                    chk_class_details.add("I - " + " ");
+                    chk_class_details.add("O - " + " ");
+                }
+            }
+            else if(cur_line.matches("class (.*?) implements (.*?)"))
+            {
+                cur_class_name= cur_line.substring(6, cur_line.indexOf("implements"));
 
                 cur_line = cur_line.replace("class", "");
-                //cur_line = cur_line.replace("implements", "");
+                cur_line = cur_line.replace("implements", "");
                 cur_line = cur_line.replace(cur_class_name, "");
-                cur_line = cur_line.replace("{", "");
-                cur_line = cur_line.replace("}", "");
+                cur_line = cur_line.replace(" ", "");
 
-                chk_class_details.add("PC - " + cur_line.substring(cur_line.indexOf("extends")+8,cur_line.indexOf("implements")));
+                chk_class_details.add("PC - " + " ");
 
-                String[] interfaces=cur_line.substring(cur_line.indexOf("implements")+11).split(",");
+                String[] interfaces=cur_line.split(",");
 
                 for (int i=0; i<interfaces.length;i++)
                 {
-                    chk_class_details.add("I - " + interfaces[i]);                    
+                    chk_class_details.add("I - " + interfaces[i]);
                 }
-                
+
                 chk_class_details.add("O - " + " ");
-                
-                
+
             }
-            else
+            else if(cur_line.matches("class (.*?)"))
             {            
-                cur_class_name= cur_line.substring(cur_line.indexOf("extends")+8);
-                //System.out.println(cur_class_name); 
-                //ClassDefinition <cur_class_name> = new ClassDefinition();
-                chk_class_details.add("PC - " + cur_class_name);
+                cur_class_name= cur_line.substring(6);
+                chk_class_details.add("PC - " + " ");
                 chk_class_details.add("I - " + " ");
-                chk_class_details.add("O - " + " ");
-                //cd[cd_count].parent_class = cur_class_name;
-                //System.out.println("extend");     
-                //System.out.println( cd[cd_count].parent_class);
-            }
-        }
-        else if(cur_line.matches("class (.*?) implements (.*?)"))
-        {
-            cur_class_name= cur_line.substring(6, cur_line.indexOf("implements"));
-            //System.out.println(cur_class_name); 
-            //System.out.println("implement");     
-            
-            cur_line = cur_line.replace("class", "");
-            cur_line = cur_line.replace("implements", "");
-            cur_line = cur_line.replace(cur_class_name, "");
-            cur_line = cur_line.replace(" ", "");
-            
-            chk_class_details.add("PC - " + " ");
-            
-            //System.out.println(cur_line); 
-            
-            String[] interfaces=cur_line.split(",");
-            
-            for (int i=0; i<interfaces.length;i++)
-            {
-                chk_class_details.add("I - " + interfaces[i]);
-                //cd[cd_count].interf_names.add(interfaces[i]);
-                //System.out.println(interfaces[i]); 
-            }
-            //cd[cd_count].interf_names = chk_class_details;
-//            for (int c=0; c<interfaces.length;c++)
-//            {
-//                System.out.println(cd[cd_count].interf_names.elementAt(c)); 
-//            }
-            chk_class_details.add("O - " + " ");
-            
-        }
-        else if(cur_line.matches("class (.*?)"))
-        {
-            
-            cur_class_name= cur_line.substring(6);
-            //System.out.println(cur_class_name); 
-            //System.out.println("normal");  
-            chk_class_details.add("PC - " + " ");
-            chk_class_details.add("I - " + " ");
-            chk_class_details.add("O - Object");
-        }
-        //cd_count++;
+                chk_class_details.add("O - Object");
+            }       
         }
         else
         {
@@ -644,14 +602,14 @@ public class CriticalTextAnalyzer extends ClassDefinition{
                 //Show Class Name
 
                 cd_temp[cd_count].class_name = file_class_Details.elementAt(ele_id).toString().substring(5);
-                System.out.println(file_class_Details.elementAt(ele_id).toString().substring(5) );
+                //System.out.println(file_class_Details.elementAt(ele_id).toString().substring(5) );
 
                 ele_id++;
 
                 //Show Parent Class
 
                 cd_temp[cd_count].parent_class = file_class_Details.elementAt(ele_id).toString().substring(5);
-                System.out.println(file_class_Details.elementAt(ele_id+1).toString().substring(5));
+                //System.out.println(file_class_Details.elementAt(ele_id+1).toString().substring(5));
 
                 ele_id++;
 
@@ -664,14 +622,14 @@ public class CriticalTextAnalyzer extends ClassDefinition{
 
                 //Show Elements in interfaces
 
-                System.out.println(cd_temp[cd_count].interf_names.size());
+                //System.out.println(cd_temp[cd_count].interf_names.size());
 
 
 
                 if((cd_temp[cd_count].parent_class).equals(""))
                 {
                     cd_temp[cd_count].parent_class = file_class_Details.elementAt(ele_id).toString().substring(4);
-                    System.out.println(cd_temp[cd_count].parent_class );
+                    //System.out.println(cd_temp[cd_count].parent_class );
                 }
 
 
@@ -705,15 +663,15 @@ public class CriticalTextAnalyzer extends ClassDefinition{
         while ((line = bufferReader.readLine()) != null)   
         {   
             
-            //check_comment_new();
+            check_comment_new();
                         
-            //tot_alpha_word_count+= getNumTokens();
+            tot_alpha_word_count+= getNumTokens();
           
-            //tot_literal_string_count+= getNumStrings();
+            tot_literal_string_count+= getNumStrings();
             
-            //literal_strings.add(getStrings());
+            literal_strings.add(getStrings());
             
-            //identify_variable();
+            identify_variable();
             
             file_class_Details = getClassDefinitions();
             class_cat();
@@ -806,6 +764,8 @@ public class CriticalTextAnalyzer extends ClassDefinition{
     
     public static void main(String args[])
     {
+        
+         
         
          CriticalTextAnalyzer c = new CriticalTextAnalyzer("test.txt");  
          c.read_file_contents();       
