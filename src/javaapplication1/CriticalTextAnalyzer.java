@@ -15,6 +15,7 @@ import sun.org.mozilla.javascript.internal.regexp.SubString;
 class ClassDefinition
 {    
     public Vector interf_names = new Vector<Object>(); 
+    public Vector method_names = new Vector<Object>(); 
     public String parent_class="";
     public String class_name="";
     
@@ -27,8 +28,29 @@ class ClassDefinition
     {    
         return interf_names;
     }
+    
+    public Vector getMethodDefinitions()
+    {
+        return method_names;
+    }
 }
-public class CriticalTextAnalyzer extends ClassDefinition{
+
+class MethodDefinition
+{
+    public String method_name="";
+    public String return_type="";   
+    
+    public String geMethodName()
+    {    
+        return method_name;
+    }
+
+    public String getReturnType()
+    {
+        return return_type;
+    }
+}
+public class CriticalTextAnalyzer{
 
     //Variable to hold the file path
     public static String file_path="";
@@ -76,6 +98,9 @@ public class CriticalTextAnalyzer extends ClassDefinition{
     public int cd_count=0;
     
     public static ClassDefinition[] cd_temp;
+        
+    public int cls_meth_flag=0;
+    public int meth=0;
    //ClassDefinition[] cd;
     
     CriticalTextAnalyzer(String u_file_path) 
@@ -83,6 +108,44 @@ public class CriticalTextAnalyzer extends ClassDefinition{
         //Intializes file path sent while object creationg to the variable file_path
         file_path=u_file_path;        
     }  
+    
+    public Vector getMethodDefinitions()
+    {
+        Vector chk_method_details = new Vector<Object>();
+        
+        String cur_line = line;
+        
+        cur_line = cur_line.replace("public", "");
+        cur_line = cur_line.replace("protected", "");
+        cur_line = cur_line.replace("private", "");
+        cur_line = cur_line.replace("static", "");
+        cur_line = cur_line.trim().replace(",\\s+", ",");
+        
+        if((cur_line.matches("(.*?){(.*?)"))&(cur_line.matches("class (.*?)")) )
+        {        
+            cls_meth_flag=1;  
+            meth=1;
+        }
+        else if((cur_line.matches("(.*?){(.*?)")))
+        {
+            cls_meth_flag++; 
+            meth=3;
+            
+        }
+        else if((cur_line.matches("(.*?)}(.*?)")))
+        {
+            cls_meth_flag--;         
+        }
+        
+        if((cur_line.matches("(.*?)\\(\\)"))&(meth==1))
+        {
+            meth=2;
+        }
+        
+        
+        
+        return chk_method_details;
+    }
     
     public Vector getClassDefinitions()
     {
