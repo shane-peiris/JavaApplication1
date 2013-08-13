@@ -1,14 +1,26 @@
-public interface D
-{}
-public interface E
-{}
+public class A {
+
+	public A shane() {
+
+		if()
+		{
+
+		}
+	}
+	public int shane1(){
+
+
+	}
+
+
+}
 public class B
-{}
-public class A extends B
-{}
-public class C implements D
-{}
-public class F implements D,E,L,P
-{}
-public class G extends B implements D
-{}
+{
+	public String shane2() 
+	{
+
+		if(dsfsdfs){
+
+		}
+	}
+}

@@ -101,6 +101,10 @@ public class CriticalTextAnalyzer{
         
     public int cls_meth_flag=0;
     public int meth=0;
+    public String prv_line="";
+    public Vector file_meth_Details = new Vector<Object>();
+    public static MethodDefinition[] md;
+    public int md_count=0;
    //ClassDefinition[] cd;
     
     CriticalTextAnalyzer(String u_file_path) 
@@ -115,34 +119,82 @@ public class CriticalTextAnalyzer{
         
         String cur_line = line;
         
+        String method_name="";
+        String meth_ret_type="";
+                
         cur_line = cur_line.replace("public", "");
         cur_line = cur_line.replace("protected", "");
         cur_line = cur_line.replace("private", "");
         cur_line = cur_line.replace("static", "");
         cur_line = cur_line.trim().replace(",\\s+", ",");
         
-        if((cur_line.matches("(.*?){(.*?)"))&(cur_line.matches("class (.*?)")) )
+        
+        System.out.println(cur_line);
+        
+        
+        
+        
+        if((cur_line.contains("{"))&(prv_line.matches("class (.*?)"))&(cls_meth_flag==0))
         {        
             cls_meth_flag=1;  
             meth=1;
+            System.out.println("Inside class");
         }
-        else if((cur_line.matches("(.*?){(.*?)")))
+        else if((cur_line.contains("{"))&(cur_line.matches("class (.*?)"))&(cls_meth_flag==0) )
+        {        
+            cls_meth_flag=1;
+            meth=1;
+            System.out.println("Inside class");
+        }
+        else if((cur_line.matches("(.*?)\\(\\)(.*?)"))&(meth==1)&((cur_line.contains("{"))))
+        {
+            cls_meth_flag++;
+            meth=2;         
+//            System.out.println((cur_line.indexOf(" ", 0)+1));
+//            System.out.println((cur_line.indexOf("(")));
+//            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
+            method_name=cur_line.substring((cur_line.indexOf(" ", 0)+1),((cur_line.indexOf("("))));
+            method_name = method_name.trim().replace(" ", "");
+            System.out.println(method_name);  
+            chk_method_details.add(method_name);
+            
+            meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
+            System.out.println(meth_ret_type);  
+            chk_method_details.add(meth_ret_type);  
+            System.out.println("Inside method");
+        }  
+        else if((prv_line.matches("(.*?)\\(\\)"))&(meth==1)&((cur_line.contains("{"))))
         {
             cls_meth_flag++; 
-            meth=3;
-            
-        }
-        else if((cur_line.matches("(.*?)}(.*?)")))
-        {
-            cls_meth_flag--;         
-        }
-        
-        if((cur_line.matches("(.*?)\\(\\)"))&(meth==1))
-        {
             meth=2;
+            
+            method_name=prv_line.substring((prv_line.indexOf(" ", 0)+1),((prv_line.indexOf("("))));
+            method_name = method_name.trim().replace(" ", "");
+            System.out.println(method_name);   
+            chk_method_details.add(method_name);
+            
+            meth_ret_type=prv_line.substring(0,(prv_line.indexOf(" ")));
+            System.out.println(meth_ret_type); 
+            chk_method_details.add(meth_ret_type); 
+            
+            System.out.println("Inside method");
+        }        
+        else if((cur_line.contains("{")))
+        {
+            cls_meth_flag++; 
+            //meth=3;            
+        }
+        else if((cur_line.contains("}")))
+        {
+            cls_meth_flag--;
+            if(cls_meth_flag==1)
+            {
+                meth=1;
+            }
         }
         
         
+        prv_line = cur_line;
         
         return chk_method_details;
     }
@@ -542,7 +594,7 @@ public class CriticalTextAnalyzer{
             if(cur_line.matches("(.*?)\\((.*?)\\)(.*?)") & (!(cur_line.substring(0, 3).equals("for"))))
             {               
                 cur_line = cur_line.replaceAll("\\)", ",\\)");
-                System.out.println(cur_line);
+                //System.out.println(cur_line);
                 String pat="(.*?),(.*?)";                
                 Pattern p = Pattern.compile(pat);
                 Matcher m = p.matcher(cur_line.substring((cur_line.indexOf("("))+1));
@@ -550,7 +602,7 @@ public class CriticalTextAnalyzer{
                     //semi_seps.add(m.group(1));
         // System.out.println(m.group(1));
                    // var_flag=0;
-                   System.out.println(m.group(1));
+                   //System.out.println(m.group(1));
                    add_variable_type(m.group(1));
                     
                 }
@@ -701,6 +753,14 @@ public class CriticalTextAnalyzer{
     
     }
     
+     public void meth_cat()
+     {
+         if(!(file_meth_Details.elementAt(0).toString().equals(" ")))
+         {
+                md[md_count] = new MethodDefinition();
+         }
+     }
+    
     public void read_file_contents()
     {
          try{
@@ -721,27 +781,30 @@ public class CriticalTextAnalyzer{
         BufferedReader bufferReader = new BufferedReader(fileToRead);
         
         cd_temp = new ClassDefinition[file_line_count];
-                
+        md = new MethodDefinition[file_line_count];       
                 
         while ((line = bufferReader.readLine()) != null)   
         {   
             
-            check_comment_new();
-                        
-            tot_alpha_word_count+= getNumTokens();
-          
-            tot_literal_string_count+= getNumStrings();
+//            check_comment_new();
+//                        
+//            tot_alpha_word_count+= getNumTokens();
+//          
+//            tot_literal_string_count+= getNumStrings();
+//            
+//            literal_strings.add(getStrings());
+//            
+//            identify_variable();
+//            
+//            file_class_Details = getClassDefinitions();
+//            class_cat();
             
-            literal_strings.add(getStrings());
+              file_meth_Details= getMethodDefinitions();
+              meth_cat();
             
-            identify_variable();
-            
-            file_class_Details = getClassDefinitions();
-            class_cat();
-            
-            
-            file_class_Details.removeAllElements();
-            line_count++;
+              file_meth_Details.removeAllElements();
+              file_class_Details.removeAllElements();
+              line_count++;
         } 
         
 //        cd = new ClassDefinition[cd_count];
