@@ -1,6 +1,6 @@
 public class A {
 
-	public A shane() {
+	public A shane(int a) {
 
 		if()
 		{

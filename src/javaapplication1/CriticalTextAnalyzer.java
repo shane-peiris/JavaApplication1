@@ -105,6 +105,8 @@ public class CriticalTextAnalyzer{
     public Vector file_meth_Details = new Vector<Object>();
     public static MethodDefinition[] md;
     public int md_count=0;
+    
+    public String class_in="";
    //ClassDefinition[] cd;
     
     CriticalTextAnalyzer(String u_file_path) 
@@ -139,14 +141,38 @@ public class CriticalTextAnalyzer{
             cls_meth_flag=1;  
             meth=1;
             System.out.println("Inside class");
+            
+            try
+            {
+                class_in= prv_line.substring(6,prv_line.indexOf(" ", 6));
+            }
+            catch(Exception ex)
+            {
+                class_in= prv_line.substring(6);
+            }   
+            class_in = class_in.replace("{", "");
+            System.out.println(class_in);
+            
         }
         else if((cur_line.contains("{"))&(cur_line.matches("class (.*?)"))&(cls_meth_flag==0) )
         {        
             cls_meth_flag=1;
             meth=1;
             System.out.println("Inside class");
+            
+            try
+            {
+                class_in= cur_line.substring(6,prv_line.indexOf(" ", 6));
+            }
+            catch(Exception ex)
+            {
+                class_in= cur_line.substring(6);
+            }   
+            class_in = class_in.replace("{", "");
+            System.out.println(class_in);
+            
         }
-        else if((cur_line.matches("(.*?)\\(\\)(.*?)"))&(meth==1)&((cur_line.contains("{"))))
+        else if((cur_line.matches("(.*?)\\((.*?)\\)(.*?)"))&(meth==1)&((cur_line.contains("{"))))
         {
             cls_meth_flag++;
             meth=2;         
@@ -162,8 +188,11 @@ public class CriticalTextAnalyzer{
             System.out.println(meth_ret_type);  
             chk_method_details.add(meth_ret_type);  
             System.out.println("Inside method");
+            
+            cd_temp[cd_count].method_names.add(method_name);
+            md_count++;
         }  
-        else if((prv_line.matches("(.*?)\\(\\)"))&(meth==1)&((cur_line.contains("{"))))
+        else if((prv_line.matches("(.*?)\\((.*?)\\)"))&(meth==1)&((cur_line.contains("{"))))
         {
             cls_meth_flag++; 
             meth=2;
@@ -178,6 +207,8 @@ public class CriticalTextAnalyzer{
             chk_method_details.add(meth_ret_type); 
             
             System.out.println("Inside method");
+            cd_temp[cd_count].method_names.add(method_name);
+            md_count++;
         }        
         else if((cur_line.contains("{")))
         {
@@ -225,6 +256,9 @@ public class CriticalTextAnalyzer{
                 cur_class_name= cur_line.substring(6);
             }
             chk_class_details.add("CN - " + cur_class_name);
+            
+            
+            
         
             if(cur_line.matches("class (.*?) extends (.*?)"))
             {
@@ -243,6 +277,8 @@ public class CriticalTextAnalyzer{
                     }
 
                     chk_class_details.add("O - " + " ");
+                    
+                    
                 }
                 else
                 {            
@@ -757,7 +793,9 @@ public class CriticalTextAnalyzer{
      {
          if(!(file_meth_Details.elementAt(0).toString().equals(" ")))
          {
-                md[md_count] = new MethodDefinition();
+                md[md_count] = new MethodDefinition();                
+                md[md_count].method_name  = file_meth_Details.elementAt(0).toString();
+                md[md_count].return_type  = file_meth_Details.elementAt(1).toString();
          }
      }
     
@@ -796,11 +834,15 @@ public class CriticalTextAnalyzer{
 //            
 //            identify_variable();
 //            
-//            file_class_Details = getClassDefinitions();
-//            class_cat();
+              file_class_Details = getClassDefinitions();
+              class_cat();
             
               file_meth_Details= getMethodDefinitions();
-              meth_cat();
+              try
+              {
+                meth_cat();
+              }
+              catch(Exception ex){}
             
               file_meth_Details.removeAllElements();
               file_class_Details.removeAllElements();
@@ -876,7 +918,24 @@ public class CriticalTextAnalyzer{
                 }
             
             }
+            
+            if((cd_temp[a].getMethodDefinitions().size()==1) & (cd_temp[a].getMethodDefinitions().elementAt(0).equals(" ")))
+                System.out.println("Methods : NULL");
+            else
+            {
+                System.out.println("Interface List");
+                
+                for(int z=0;z<cd_temp[a].getInterfaceNames().size();z++)
+                {
+                    System.out.println(" * " + cd_temp[a].getInterfaceNames().elementAt(z));
+                }
+            }
         }
+        
+        System.out.println("\n*********************Method Details*****************************\n");
+        
+        //System.out.println("\nTotal Class count " + cd_count);
+        
         
         System.out.println("\n***************************************************************\n");
         }
