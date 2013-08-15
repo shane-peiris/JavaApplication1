@@ -40,7 +40,7 @@ class MethodDefinition
     public String method_name="";
     public String return_type="";   
     
-    public String geMethodName()
+    public String getMethodName()
     {    
         return method_name;
     }
@@ -189,7 +189,11 @@ public class CriticalTextAnalyzer{
             chk_method_details.add(meth_ret_type);  
             System.out.println("Inside method");
             
-            cd_temp[cd_count].method_names.add(method_name);
+            cd_temp[cd_count-1].method_names.add(method_name.toString());
+            
+            md[md_count] = new MethodDefinition();
+            md[md_count].method_name = method_name.toString();
+            md[md_count].return_type = meth_ret_type.toString();
             md_count++;
         }  
         else if((prv_line.matches("(.*?)\\((.*?)\\)"))&(meth==1)&((cur_line.contains("{"))))
@@ -207,7 +211,11 @@ public class CriticalTextAnalyzer{
             chk_method_details.add(meth_ret_type); 
             
             System.out.println("Inside method");
-            cd_temp[cd_count].method_names.add(method_name);
+            cd_temp[cd_count-1].method_names.add(method_name.toString());
+            
+            md[md_count] = new MethodDefinition();
+            md[md_count].method_name = method_name.toString();
+            md[md_count].return_type = meth_ret_type.toString();
             md_count++;
         }        
         else if((cur_line.contains("{")))
@@ -895,6 +903,8 @@ public class CriticalTextAnalyzer{
         
         System.out.println("\nTotal Class count " + cd_count);
         
+        md_count=0;
+        
         for(int a=0;a<cd_count;a++)
         {
             System.out.println("\nClass " + (a+1));
@@ -923,18 +933,33 @@ public class CriticalTextAnalyzer{
                 System.out.println("Methods : NULL");
             else
             {
-                System.out.println("Interface List");
+                System.out.println("Total Method count : " + cd_temp[a].getMethodDefinitions().size());
+                System.out.println("Method Details");    
                 
-                for(int z=0;z<cd_temp[a].getInterfaceNames().size();z++)
+                for(int z=0;z<cd_temp[a].getMethodDefinitions().size();z++)
                 {
-                    System.out.println(" * " + cd_temp[a].getInterfaceNames().elementAt(z));
+                    
+                    System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " -- Return Type : " + md[md_count].getReturnType());
+                    
+                    md_count++;
+                    
                 }
             }
         }
         
-        System.out.println("\n*********************Method Details*****************************\n");
-        
-        //System.out.println("\nTotal Class count " + cd_count);
+//        System.out.println("\n*********************Method Details*****************************\n");
+//        
+//        System.out.println("Total Method count " + md_count);
+//        
+//        //System.out.println("\nTotal Class count " + cd_count);
+//        System.out.println("\n Method List \n");
+//        
+//        for(int p=0;p<md_count;p++)
+//        {
+//            System.out.println(" Method Name  :  " + md[p].getMethodName());
+//            System.out.println(" Return Type  :  " + md[p].getReturnType() + "\n");
+//            
+//        }
         
         
         System.out.println("\n***************************************************************\n");
