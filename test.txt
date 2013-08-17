@@ -1,26 +1,23 @@
-public class A {
+public class A
+{
+	
 
-	public A shane(int a) {
+	public void shane(){
 
 		if()
 		{
-
+		
 		}
-	}
-	public int shane1(){
-
 
 	}
-
 
 }
-public class B
-{
-	public String shane2() 
+
+public class B{
+
+	public int next()
 	{
 
-		if(dsfsdfs){
-
-		}
 	}
+
 }
