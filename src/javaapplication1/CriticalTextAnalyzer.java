@@ -134,7 +134,7 @@ public class CriticalTextAnalyzer{
         cur_line = cur_line.trim().replace(",\\s+", ",");
         
         
-        System.out.println(cur_line);
+        //System.out.println(cur_line);
         
         
         
@@ -145,7 +145,7 @@ public class CriticalTextAnalyzer{
         {        
             cls_meth_flag=1;  
             meth=1;
-            System.out.println("Inside class********************************************************");
+            //System.out.println("Inside class********************************************************");
             
             try
             {
@@ -157,7 +157,7 @@ public class CriticalTextAnalyzer{
             }   
             class_in = class_in.replace("{", "");
             class_in = class_in.replace(" ", "");
-            System.out.println(class_in);
+            //System.out.println(class_in);
             
         }
         //Identify Class
@@ -165,7 +165,7 @@ public class CriticalTextAnalyzer{
         {        
             cls_meth_flag=1;
             meth=1;
-            System.out.println("Inside class*************************************************");
+            //System.out.println("Inside class*************************************************");
             
             try
             {
@@ -177,7 +177,7 @@ public class CriticalTextAnalyzer{
             }   
             class_in = class_in.replace("{", "");
             class_in = class_in.replace(" ", "");
-            System.out.println(class_in);
+            //System.out.println(class_in);
             
         }  
         //Identify Constructor
@@ -190,14 +190,14 @@ public class CriticalTextAnalyzer{
 //            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
             method_name=cur_line.substring(0,((cur_line.indexOf("("))));
             method_name = method_name.trim().replace(" ", "");
-            System.out.println(method_name);  
+            //System.out.println(method_name);  
             chk_method_details.add(method_name);
             
 //            meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
 //            System.out.println(meth_ret_type);  
 //            chk_method_details.add(meth_ret_type);
             
-            System.out.println("Inside method***********************************************************");
+            //System.out.println("Inside method***********************************************************");
             
             cd_temp[cd_count-1].method_names.add(method_name.toString());
             
@@ -216,14 +216,14 @@ public class CriticalTextAnalyzer{
 //            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
             method_name=prv_line.substring(0,((prv_line.indexOf("("))));
             method_name = method_name.trim().replace(" ", "");
-            System.out.println(method_name);  
+            //System.out.println(method_name);  
             chk_method_details.add(method_name);
             
 //            meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
 //            System.out.println(meth_ret_type);  
 //            chk_method_details.add(meth_ret_type);
             
-            System.out.println("Inside method*********************************************************************");
+            //System.out.println("Inside method*********************************************************************");
             
             cd_temp[cd_count-1].method_names.add(method_name.toString());
             
@@ -243,13 +243,13 @@ public class CriticalTextAnalyzer{
 //            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
             method_name=cur_line.substring((cur_line.indexOf(" ", 0)+1),((cur_line.indexOf("("))));
             method_name = method_name.trim().replace(" ", "");
-            System.out.println(method_name);  
+            //System.out.println(method_name);  
             chk_method_details.add(method_name);
             
             meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
-            System.out.println(meth_ret_type);  
+            //System.out.println(meth_ret_type);  
             chk_method_details.add(meth_ret_type);  
-            System.out.println("Inside method******************************************************************");
+            //System.out.println("Inside method******************************************************************");
             
             cd_temp[cd_count-1].method_names.add(method_name.toString());
             
@@ -266,14 +266,14 @@ public class CriticalTextAnalyzer{
             
             method_name=prv_line.substring((prv_line.indexOf(" ", 0)+1),((prv_line.indexOf("("))));
             method_name = method_name.trim().replace(" ", "");
-            System.out.println(method_name);   
+            //System.out.println(method_name);   
             chk_method_details.add(method_name);
             
             meth_ret_type=prv_line.substring(0,(prv_line.indexOf(" ")));
-            System.out.println(meth_ret_type); 
+            //System.out.println(meth_ret_type); 
             chk_method_details.add(meth_ret_type); 
             
-            System.out.println("Inside method***********************************************************************");
+            //System.out.println("Inside method***********************************************************************");
             cd_temp[cd_count-1].method_names.add(method_name.toString());
             
             md[md_count] = new MethodDefinition();
@@ -285,7 +285,7 @@ public class CriticalTextAnalyzer{
         {
             cls_meth_flag++; 
             meth++;
-            
+            //System.out.println("jjjj"+cur_line.substring((cur_line.length()-1)));
             if((cur_line.substring((cur_line.length())-1).equals("}")))
             {
                 cls_meth_flag--;
@@ -311,26 +311,6 @@ public class CriticalTextAnalyzer{
         {
         
         }
-        
-        
-        
-//        else if((cur_line.contains("{")) & (cur_line.matches("(.*?)\\{")))
-//        {
-//            cls_meth_flag++; 
-//            meth++;
-//            //meth=3;            
-//        }
-//        else if((cur_line.contains("}")) & (cur_line.matches("(.*?)\\{")))
-//        {
-//            cls_meth_flag--;
-//            meth--;
-//            if(cls_meth_flag==0)
-//            {
-//                meth=0;
-//            }
-//        }
-        
-        
         prv_line = cur_line;
         
         return chk_method_details;
@@ -930,15 +910,15 @@ public class CriticalTextAnalyzer{
         while ((line = bufferReader.readLine()) != null)   
         {   
             
-//            check_comment_new();
-//                        
-//            tot_alpha_word_count+= getNumTokens();
-//          
-//            tot_literal_string_count+= getNumStrings();
-//            
-//            literal_strings.add(getStrings());
-//            
-//            identify_variable();
+            check_comment_new();
+                        
+            tot_alpha_word_count+= getNumTokens();
+          
+            tot_literal_string_count+= getNumStrings();
+            
+            literal_strings.add(getStrings());
+            
+            identify_variable();
 //            
               file_class_Details = getClassDefinitions();
               class_cat();
@@ -963,19 +943,35 @@ public class CriticalTextAnalyzer{
 //        
 //        }
         //Close the buffer reader
-        bufferReader.close();
+        bufferReader.close();      
+       
         
         //Display final total count of Alphanumeric Tokens
         System.out.println("\nTotal count of Alphanumeric Tokens (without comments and literal strings) : " + (tot_alpha_word_count));
-        System.out.println("\nTotal count of Literal Strings : " + tot_literal_string_count);
+        //System.out.println("\nTotal count of Literal Strings : " + tot_literal_string_count);
         
+        int count=0;
+         for (int l=0;l<literal_strings.size();l++)
+         {
+                if(!(literal_strings.elementAt(l).toString().equals("[]")))
+                {                     
+                    count++;
+                }
+         }
+        System.out.println("\nTotal count of Literal Strings : " + count);
         
-        int count=1;
+       
         
-        if(tot_literal_string_count>0)
+        if(count>0)
         {
             System.out.println("\nThe list of Literal Strings : ");
         }
+        else
+        {
+            System.out.println("\nNo Literal Strings to Display");
+        }
+        
+        count=1;
         
         for (int l=0;l<literal_strings.size();l++)
         {
@@ -988,7 +984,7 @@ public class CriticalTextAnalyzer{
         
         System.out.println("\n*********************Variable Details**************************\n");
         
-        System.out.println("\nTotal int variable count " + getNumIntVariables());
+        System.out.println("Total int variable count " + getNumIntVariables());
         System.out.println("\nTotal boolean variable count " + getNumBooleanVariables());
         System.out.println("\nTotal char variable count " + getNumCharVariables());
         System.out.println("\nTotal double variable count " + getNumDoubleVariables());
@@ -999,7 +995,7 @@ public class CriticalTextAnalyzer{
         
         System.out.println("\n*********************Class Details*****************************\n");
         
-        System.out.println("\nTotal Class count " + cd_count);
+        System.out.println("Total Class count " + cd_count);
         
         md_count=0;
         
@@ -1037,7 +1033,7 @@ public class CriticalTextAnalyzer{
                 for(int z=0;z<cd_temp[a].getMethodDefinitions().size();z++)
                 {
                     
-                    System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " -- Return Type : " + md[md_count].getReturnType());
+                    System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " / Return Type : " + md[md_count].getReturnType());
                     
                     md_count++;
                     
@@ -1060,7 +1056,7 @@ public class CriticalTextAnalyzer{
 //        }
         
         
-        System.out.println("\n***************************************************************\n");
+        //System.out.println("\n***************************************************************\n");
         }
         catch(Exception e)
         {

@@ -1,23 +1,58 @@
-public class A
-{
-	
+package javaapplication1;
+/**
+ *
+ * @author Shane
+ */
 
-	public void shane(){
+import java.io.*;
+import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import sun.org.mozilla.javascript.internal.Evaluator;
+import sun.org.mozilla.javascript.internal.regexp.SubString;
 
-		if()
-		{
-		
-		}
+class ClassDefinition
+{    
+    public Vector interf_names = new Vector<Object>(); 
+    public Vector method_names = new Vector<Object>(); 
+    public String parent_class="";
+    public String class_name="";
+    public int test=0;
+    public float test2=0;
 
-	}
-
+    ClassDefinition()
+    {
+	parent_class=""
+    }
+    public String getParentClassName()
+    {    
+        return parent_class;
+    }
+    
+    public Vector getInterfaceNames()
+    {    
+        return interf_names;
+    }
+    
+    public Vector getMethodDefinitions()
+    {
+        return method_names;
+    }
 }
 
-public class B{
+class MethodDefinition
+{
+    public String method_name="";
+    public String return_type="";   
+    
+    public String getMethodName()
+    {    
+        return method_name;
+    }
 
-	public int next()
-	{
-
-	}
-
+    public String getReturnType()
+    {
+        return return_type;
+    } 	
 }
