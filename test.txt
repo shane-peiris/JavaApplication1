@@ -14,8 +14,8 @@ import sun.org.mozilla.javascript.internal.regexp.SubString;
 
 class ClassDefinition
 {    
-    public Vector interf_names = new Vector<Object>(); 
-    public Vector method_names = new Vector<Object>(); 
+    //public Vector interf_names = new Vector<Object>(); 
+    //public Vector method_names = new Vector<Object>(); 
     public String parent_class="";
     public String class_name="";
     public int test=0;
@@ -23,9 +23,9 @@ class ClassDefinition
 
     ClassDefinition()
     {
-	parent_class=""
+	parent_class="";
     }
-    public String getParentClassName()
+    public String getParentClassName(String shane, int shevon)
     {    
         return parent_class;
     }
