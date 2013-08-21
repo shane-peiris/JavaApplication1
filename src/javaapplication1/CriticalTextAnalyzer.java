@@ -37,6 +37,8 @@ class ClassDefinition
 
 class MethodDefinition
 {
+    public Vector para_Defs = new Vector<Object>();
+    public Vector loc_variables = new Vector<Object>();
     public String method_name="";
     public String return_type="";   
     
@@ -49,6 +51,53 @@ class MethodDefinition
     {
         return return_type;
     }
+    
+    public Vector getParameterDefinitions()
+    {    
+        return para_Defs;
+    }
+    
+    public Vector getLocalVariables()
+    {    
+        return loc_variables;        
+    }
+    
+}
+
+class VariableDefinition
+{
+    public String var_name="";
+    public String var_type="";
+    public String var_par_or_prim;
+    
+    public String getVariableName()
+    {
+        return var_name;
+    }
+    
+    public String getVariableType()
+    {
+        return var_type;
+    }
+    
+    public boolean isParameter()
+    {
+        if(var_par_or_prim.equals("Parameter"))
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean isPrimitive()
+    {
+        if(var_par_or_prim.equals("Primitive"))
+        {
+            return true;
+        }
+        return false;
+    }
+    
 }
 public class CriticalTextAnalyzer{
 
