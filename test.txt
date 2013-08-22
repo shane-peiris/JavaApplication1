@@ -16,9 +16,10 @@ class ClassDefinition
 {    
     //public Vector interf_names = new Vector<Object>(); 
     //public Vector method_names = new Vector<Object>(); 
+    public String parent_class,tt,kks;
     public String parent_class="";
     public String class_name="";
-    public int test=0;
+    public int test=0,th=0;
     public float test2=0;
 
     ClassDefinition()

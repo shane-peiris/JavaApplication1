@@ -96,8 +96,7 @@ class VariableDefinition
             return true;
         }
         return false;
-    }
-    
+    }    
 }
 public class CriticalTextAnalyzer{
 
@@ -255,6 +254,8 @@ public class CriticalTextAnalyzer{
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = "NULL";
             md_count++;
+            
+            identify_variable("count");
         } 
           //Identify Constructor
           else if(((prv_line.matches(class_in+" \\((.*?)\\)"))|(prv_line.matches(class_in+"\\((.*?)\\)")))&(meth==1)&((cur_line.contains("{"))))
@@ -281,6 +282,8 @@ public class CriticalTextAnalyzer{
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = "NULL";
             md_count++;
+            
+            identify_variable("count");
         } 
         
          //Identify Method
@@ -307,6 +310,8 @@ public class CriticalTextAnalyzer{
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = meth_ret_type.toString();
             md_count++;
+            
+            identify_variable("count");
         }  
          //Identify Method
         else if((prv_line.matches("(.*?)\\((.*?)\\)"))&(meth==1)&((cur_line.contains("{"))))
@@ -330,9 +335,12 @@ public class CriticalTextAnalyzer{
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = meth_ret_type.toString();
             md_count++;
+            
+            
+            
         }  
         else if(((cur_line.length()==1)&(cur_line.contains("{")))|(cur_line.substring((cur_line.length())-1).equals("{")))
-        {
+        {            
             cls_meth_flag++; 
             meth++;
             //System.out.println("jjjj"+cur_line.substring((cur_line.length()-1)));
@@ -355,6 +363,10 @@ public class CriticalTextAnalyzer{
             {
                 meth=0;
             }
+        }
+        else if(cls_meth_flag>0)
+        {
+              identify_variable("count");  
         }
         }
         catch(Exception ex)
@@ -663,11 +675,119 @@ public class CriticalTextAnalyzer{
         return curr_literal_strings;
     }
     
-    public void add_variable_type(String proc_line)
+    public void add_to_var_defs(String sep_line,String prim_para_type)
+    {        
+        Vector temp = new Vector<Object>();
+                
+        String var_type="";
+        String var_name="";
+        
+        //System.out.println(sep_line + prim_para_type);
+        //System.out.println(sep_line.substring(0,sep_line.indexOf(" ")));
+        var_type = sep_line.substring(0,sep_line.indexOf(" "));
+        sep_line = sep_line.trim().replace(sep_line.substring(0,sep_line.indexOf(" ")), "");
+        sep_line = sep_line.trim().replace(" ","");
+        
+        
+       
+        
+        
+        if(sep_line.contains(","))
+        {
+            for(int i=0;i<sep_line.length();i++)
+            {
+                if(sep_line.contains(","))
+                {       
+                    try
+                    {
+                        //System.out.println("1");
+                        //System.out.println((sep_line.substring(0,sep_line.indexOf(","))));
+                        var_name = ((sep_line.substring(0,sep_line.indexOf(","))));
+                        temp.add(var_name);
+                        
+                        //System.out.println((sep_line.substring(0,sep_line.indexOf(","))).substring(0,(sep_line.substring(0,sep_line.indexOf(","))).indexOf("=")));
+                        sep_line = sep_line.trim().replace(sep_line.substring(0,sep_line.indexOf(",")+1),"");
+                        sep_line = sep_line.trim().replace(" ","");
+                        
+                        
+                        
+                        //sep_line = sep_line.trim().replace("=(.*?)","");
+                    }
+                    catch(Exception ex)
+                    {
+                        //System.out.println("2");
+                        //System.out.println(sep_line.substring(0,sep_line.indexOf("=")));
+                        
+                        var_name = (sep_line.substring(0,sep_line.indexOf("=")));
+                        temp.add(var_name);
+                        
+                        sep_line = sep_line.trim().replace(sep_line.substring(0,sep_line.indexOf("=")),"");
+                        sep_line = sep_line.trim().replace("=(.*?),","");
+                    }
+                }
+                else
+                {
+                    //System.out.println(sep_line);
+                    //System.out.println(sep_line.substring(0) + " h");
+                    var_name = sep_line.substring(0);
+                    temp.add(var_name);
+                    break;
+                }
+            }
+        }
+        else
+        {               
+            try
+            {
+                //System.out.println(sep_line);
+                //System.out.println("3");
+                //System.out.println(sep_line.substring(0,sep_line.indexOf("=")));
+                var_name = (sep_line.substring(0,sep_line.indexOf("=")));
+                temp.add(var_name);
+            }
+            catch(Exception ex)
+            {
+                //System.out.println("4");
+                //System.out.println(sep_line.substring(0));
+                var_name = (sep_line.substring(0));
+                temp.add(var_name);
+            }
+        }
+        
+        
+        //System.out.println(var_type);
+        for(int x=0;x<temp.size();x++)
+        {
+            VariableDefinition vd = new VariableDefinition();
+        
+            vd.var_type = var_type;
+            vd.var_name = temp.elementAt(x).toString().trim().replaceAll("=.*", "");
+            vd.var_par_or_prim = prim_para_type;
+            
+            if(prim_para_type.equals("Parameter"))
+            {
+                md[md_count].para_Defs.add(vd);
+            }
+            else
+            //else if(prim_para_type.equals("Primitive"))
+            {
+                md[md_count].loc_variables.add(vd);
+            }
+            
+            //System.out.println(temp.elementAt(x).toString().trim().replaceAll("=.*", "")+"\n");
+        }
+        
+        
+        
+    }
+    
+    public void add_variable_type(String proc_line,String meth_type)
     {
         String var_type="";
         int comma_count=1;
         int multi;
+        //String prim_or_para="";
+        
         
         if(var_flag==1 & line_count==0)
             multi=1;
@@ -678,6 +798,7 @@ public class CriticalTextAnalyzer{
         
         //Vector comma_seps = new Vector<Object>();
         
+        //System.out.println(proc_line + prim_para);
         
         String pat="(.*?),";                
         Pattern p = Pattern.compile(pat);
@@ -699,36 +820,52 @@ public class CriticalTextAnalyzer{
 //            {
                 switch(last_var_type) {
                     case "int":
-                        System.out.println(proc_line + prim_para);
+                        //System.out.println(proc_line + prim_para);
                         int_var_count = int_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                            add_to_var_defs(proc_line,prim_para);
                         break;
-                    case "char":
-                        System.out.println(proc_line + prim_para);
+                    case "char": 
+                        //System.out.println(proc_line + prim_para);
                         char_var_count = char_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                         break;
                     case "byte":
-                        System.out.println(proc_line + prim_para);
+                        //System.out.println(proc_line + prim_para);
                         short_var_count = short_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                         break;
                     case "short":
-                        System.out.println(proc_line + prim_para);
+                        //System.out.println(proc_line + prim_para);
                         char_var_count = char_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                         break;
                     case "long":
-                        System.out.println(proc_line + prim_para);
+                        //System.out.println(proc_line + prim_para);
                         long_var_count = long_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                         break;
                     case "double":
-                        System.out.println(proc_line + prim_para);
+                        //System.out.println(proc_line + prim_para);
                         double_var_count = double_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                         break;
                     case "float":
-                        System.out.println(proc_line + prim_para);
+                        //System.out.println(proc_line + prim_para);
                         float_var_count = float_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                         break;
                     case "boolean":
-                        System.out.println(proc_line + prim_para);
+                        //System.out.println(proc_line + prim_para);
                         boolean_var_count = boolean_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                         break;
                 }
             //}
@@ -736,46 +873,64 @@ public class CriticalTextAnalyzer{
         else
         {
             if(proc_line.matches("(.*?)int (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     int_var_count = int_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                     last_var_type="int";}
             else if(proc_line.matches("(.*?)char (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     char_var_count = char_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                     last_var_type="char";}
             else if(proc_line.matches("(.*?)byte (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     byte_var_count = byte_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                     last_var_type="byte";}
             else if(proc_line.matches("(.*?)short (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     short_var_count = short_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                     last_var_type="short";}
             else if(proc_line.matches("(.*?)long (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     long_var_count = long_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                     last_var_type="long";}
             else if(proc_line.matches("(.*?)double (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     double_var_count = double_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                     last_var_type="double";}
             else if(proc_line.matches("(.*?)float (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     float_var_count = float_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                     last_var_type="float";}
             else if(proc_line.matches("(.*?)boolean (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     boolean_var_count = boolean_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                        add_to_var_defs(proc_line,prim_para);
                     last_var_type="boolean";}
             else if(proc_line.matches("(.*?)String (.*?)")){
-                    System.out.println(proc_line + prim_para);
+                    //System.out.println(proc_line + prim_para);
                     //boolean_var_count = boolean_var_count + comma_count;
+                        if(meth_type.equals("Count"))
+                    add_to_var_defs(proc_line,prim_para);
                     //last_var_type="boolean";
             }
         }
     }
     
-    public void identify_variable()
+    public void identify_variable(String meth_type)
     {
         String cur_line=line;
         cur_line = cur_line.replace("public", "");
@@ -807,8 +962,10 @@ public class CriticalTextAnalyzer{
                        // var_flag=0;
                        //System.out.println(m.group(1));
                        //System.out.println("Parameter");
+                       
+                                               
                        prim_para = " Parameter";
-                       add_variable_type(m.group(1));
+                       add_variable_type(m.group(1),meth_type);
 
                     }
                 }
@@ -860,7 +1017,7 @@ public class CriticalTextAnalyzer{
                 {
                     //System.out.println("Primitive");
                     prim_para = " Primitive";
-                    add_variable_type(m.group(1));
+                    add_variable_type(m.group(1),meth_type);
                 }
                 
                 count++;
@@ -882,7 +1039,7 @@ public class CriticalTextAnalyzer{
                     var_flag = 1;
                     //System.out.println("Primitive");
                     prim_para = " Primitive";
-                    add_variable_type(cur_line);
+                    add_variable_type(cur_line,meth_type);
                 }
             }
             catch(Exception ex)
@@ -898,7 +1055,7 @@ public class CriticalTextAnalyzer{
               //System.out.println(cur_line); 
                 //System.out.println("semi");
                prim_para = " Primitive"; 
-               add_variable_type(semi_seps.elementAt(i).toString());
+               add_variable_type(semi_seps.elementAt(i).toString(),meth_type);
             }
         }
     }
@@ -1009,7 +1166,7 @@ public class CriticalTextAnalyzer{
             
             literal_strings.add(getStrings());
             
-            identify_variable();
+            //identify_variable("normal");
 //            
               file_class_Details = getClassDefinitions();
               class_cat();
@@ -1121,10 +1278,41 @@ public class CriticalTextAnalyzer{
                 System.out.println("Total Method count : " + cd_temp[a].getMethodDefinitions().size());
                 System.out.println("Method Details");    
                 
+                VariableDefinition vd_temp;
+                
                 for(int z=0;z<cd_temp[a].getMethodDefinitions().size();z++)
                 {
                     
                     System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " / Return Type : " + md[md_count].getReturnType());
+                    
+                    if(!(!md[md_count].getParameterDefinitions().isEmpty())|(!md[md_count].getLocalVariables().isEmpty()))
+                    {
+                        
+                        
+                    } else {                        
+                        
+                        for(int p=0;p<md[md_count].getParameterDefinitions().size();p++)
+                        {
+                            if(p==0)
+                            {
+                                System.out.println("Parameterized Variable List\n"); 
+                            }
+                            vd_temp = (VariableDefinition) md[md_count].getParameterDefinitions().elementAt(p);
+                            System.out.println("* Variable Type : " + vd_temp.var_type + " / Variable Name : " + vd_temp.var_name);
+                        }
+                        
+                        for(int p1=0;p1<md[md_count].getLocalVariables().size();p1++)
+                        {
+                            if(p1==0)
+                            {
+                                System.out.println("Primitive Variable List");
+                            }
+                            vd_temp = (VariableDefinition) md[md_count].getLocalVariables().elementAt(p1);
+                            System.out.println("* Variable Type : " + vd_temp.var_type + " / Variable Name : " + vd_temp.var_name);
+                        
+                        }
+                    }
+                    
                     
                     md_count++;
                     
