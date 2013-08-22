@@ -250,12 +250,20 @@ public class CriticalTextAnalyzer{
             
             cd_temp[cd_count-1].method_names.add(method_name.toString());
             
-            md[md_count] = new MethodDefinition();
+            try
+              {
+                  
+                 // md[md_count] = new MethodDefinition();
+              }
+              catch(Exception ex)
+              {
+                  System.out.println(ex.toString());
+              }
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = "NULL";
             md_count++;
             
-            identify_variable("count");
+            //identify_variable("count");
         } 
           //Identify Constructor
           else if(((prv_line.matches(class_in+" \\((.*?)\\)"))|(prv_line.matches(class_in+"\\((.*?)\\)")))&(meth==1)&((cur_line.contains("{"))))
@@ -278,12 +286,19 @@ public class CriticalTextAnalyzer{
             
             cd_temp[cd_count-1].method_names.add(method_name.toString());
             
-            md[md_count] = new MethodDefinition();
+            try
+              {
+                  //md[md_count] = new MethodDefinition();
+              }
+              catch(Exception ex)
+              {
+                  System.out.println(ex.toString());
+              }
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = "NULL";
             md_count++;
             
-            identify_variable("count");
+            //identify_variable("count");
         } 
         
          //Identify Method
@@ -306,12 +321,19 @@ public class CriticalTextAnalyzer{
             
             cd_temp[cd_count-1].method_names.add(method_name.toString());
             
-            md[md_count] = new MethodDefinition();
+            try
+              {
+                  //md[md_count] = new MethodDefinition();
+              }
+              catch(Exception ex)
+              {
+                  System.out.println(ex.toString());
+              }
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = meth_ret_type.toString();
             md_count++;
             
-            identify_variable("count");
+            //identify_variable("count");
         }  
          //Identify Method
         else if((prv_line.matches("(.*?)\\((.*?)\\)"))&(meth==1)&((cur_line.contains("{"))))
@@ -331,12 +353,19 @@ public class CriticalTextAnalyzer{
             //System.out.println("Inside method***********************************************************************");
             cd_temp[cd_count-1].method_names.add(method_name.toString());
             
-            md[md_count] = new MethodDefinition();
+            try
+              {
+                  //md[md_count] = new MethodDefinition();
+              }
+              catch(Exception ex)
+              {
+                  System.out.println(ex.toString());
+              }
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = meth_ret_type.toString();
             md_count++;
             
-            
+            //identify_variable("count");
             
         }  
         else if(((cur_line.length()==1)&(cur_line.contains("{")))|(cur_line.substring((cur_line.length())-1).equals("{")))
@@ -364,14 +393,41 @@ public class CriticalTextAnalyzer{
                 meth=0;
             }
         }
-        else if(cls_meth_flag>0)
+        if(cls_meth_flag>0 & meth>=2)
         {
-              identify_variable("count");  
+              System.out.println(cur_line);
+              
+              try
+              {
+                  md[md_count] = new MethodDefinition();
+              }
+              catch(Exception ex)
+              {
+                  System.out.println(ex.toString());
+              }
+              
+              identify_variable("Count");  
+        }
+        else if(cls_meth_flag>0 & meth>=1 & (cur_line.matches("(.*?)\\((.*?)\\)(.*?)")))
+        {
+              System.out.println(cur_line);
+              
+              try
+              {
+                  md[md_count] = new MethodDefinition();
+              }
+              catch(Exception ex)
+              {
+                  System.out.println(ex.toString());
+              }
+              
+              identify_variable("Count");  
+        
         }
         }
         catch(Exception ex)
         {
-        
+            System.out.println(ex.toString());
         }
         prv_line = cur_line;
         
@@ -764,14 +820,34 @@ public class CriticalTextAnalyzer{
             vd.var_name = temp.elementAt(x).toString().trim().replaceAll("=.*", "");
             vd.var_par_or_prim = prim_para_type;
             
-            if(prim_para_type.equals("Parameter"))
+            String par = "Parameter";
+            
+            if(prim_para_type.equals(par))
             {
-                md[md_count].para_Defs.add(vd);
+                try
+                {
+                    md[md_count].para_Defs.add(vd);
+                    //System.out.println("Done");
+                }
+                catch(Exception ex)
+                {
+                    md[md_count].para_Defs.add(vd);
+                    System.out.println("Done");
+                }
             }
             else
             //else if(prim_para_type.equals("Primitive"))
             {
-                md[md_count].loc_variables.add(vd);
+                try
+                {
+                    md[md_count-1].loc_variables.add(vd);
+                    //System.out.println("Done");
+                }
+                catch(Exception ex)
+                {
+                    md[md_count].loc_variables.add(vd);
+                    System.out.println("Done");
+                }
             }
             
             //System.out.println(temp.elementAt(x).toString().trim().replaceAll("=.*", "")+"\n");
@@ -937,6 +1013,9 @@ public class CriticalTextAnalyzer{
         cur_line = cur_line.replace("protected", "");
         cur_line = cur_line.replace("private", "");
         cur_line = cur_line.trim().replace(",\\s+", ",");
+        cur_line = cur_line.replace("{", "");
+        cur_line = cur_line.replace("}", "");
+        
         
 //        System.out.println("*******Line Without public/private/protected************");
 //        System.out.println(cur_line);
@@ -964,7 +1043,7 @@ public class CriticalTextAnalyzer{
                        //System.out.println("Parameter");
                        
                                                
-                       prim_para = " Parameter";
+                       prim_para = "Parameter";
                        add_variable_type(m.group(1),meth_type);
 
                     }
@@ -972,7 +1051,10 @@ public class CriticalTextAnalyzer{
                
             }
         }
-        catch(Exception ex){}
+        catch(Exception ex){
+        
+            System.out.println(ex.toString());
+        }
         
         Vector semi_seps = new Vector<Object>();
         try
@@ -1016,7 +1098,7 @@ public class CriticalTextAnalyzer{
                 else
                 {
                     //System.out.println("Primitive");
-                    prim_para = " Primitive";
+                    prim_para = "Primitive";
                     add_variable_type(m.group(1),meth_type);
                 }
                 
@@ -1170,13 +1252,14 @@ public class CriticalTextAnalyzer{
 //            
               file_class_Details = getClassDefinitions();
               class_cat();
-            
+              
+              //System.out.println(line);
               file_meth_Details= getMethodDefinitions();
-              try
-              {
-                meth_cat();
-              }
-              catch(Exception ex){}
+//              try
+//              {
+//                meth_cat();
+//              }
+//              catch(Exception ex){}
             
               file_meth_Details.removeAllElements();
               file_class_Details.removeAllElements();
@@ -1283,34 +1366,39 @@ public class CriticalTextAnalyzer{
                 for(int z=0;z<cd_temp[a].getMethodDefinitions().size();z++)
                 {
                     
-                    System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " / Return Type : " + md[md_count].getReturnType());
+                    System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " / Return Type : " + md[md_count].getReturnType() + "\n");
                     
-                    if(!(!md[md_count].getParameterDefinitions().isEmpty())|(!md[md_count].getLocalVariables().isEmpty()))
+                    if((md[md_count].getParameterDefinitions().size()>0)|(md[md_count].getLocalVariables().size()>0))
                     {
-                        
-                        
-                    } else {                        
+                                        
                         
                         for(int p=0;p<md[md_count].getParameterDefinitions().size();p++)
                         {
                             if(p==0)
                             {
-                                System.out.println("Parameterized Variable List\n"); 
+                                System.out.println("      Parameterized Variable List\n"); 
                             }
                             vd_temp = (VariableDefinition) md[md_count].getParameterDefinitions().elementAt(p);
-                            System.out.println("* Variable Type : " + vd_temp.var_type + " / Variable Name : " + vd_temp.var_name);
+                            System.out.println("      * Variable Type : " + vd_temp.var_type + " / Variable Name : " + vd_temp.var_name);
+                        }
+                        
+                        if(md[md_count].getParameterDefinitions().size()>0)
+                        {
+                        System.out.print("\n");
                         }
                         
                         for(int p1=0;p1<md[md_count].getLocalVariables().size();p1++)
                         {
                             if(p1==0)
                             {
-                                System.out.println("Primitive Variable List");
+                                System.out.println("      Primitive Variable List\n");
                             }
                             vd_temp = (VariableDefinition) md[md_count].getLocalVariables().elementAt(p1);
-                            System.out.println("* Variable Type : " + vd_temp.var_type + " / Variable Name : " + vd_temp.var_name);
+                            System.out.println("      * Variable Type : " + vd_temp.var_type + " / Variable Name : " + vd_temp.var_name);
                         
                         }
+                        
+                        System.out.print("\n");
                     }
                     
                     

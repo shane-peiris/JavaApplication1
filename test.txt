@@ -1,38 +1,27 @@
-package javaapplication1;
-/**
- *
- * @author Shane
- */
-
-import java.io.*;
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import sun.org.mozilla.javascript.internal.Evaluator;
-import sun.org.mozilla.javascript.internal.regexp.SubString;
-
 class ClassDefinition
-{    
-    //public Vector interf_names = new Vector<Object>(); 
-    //public Vector method_names = new Vector<Object>(); 
-    public String parent_class,tt,kks;
-    public String parent_class="";
-    public String class_name="";
-    public int test=0,th=0;
-    public float test2=0;
+{       
+    
+	public String parent_class,tt,kks;
+    	
+    	
+    	public int test=0,th=0;
+    	public float test2=0;
 
-    ClassDefinition()
+    ClassDefinition(String reuben, int lloyd)
     {
+public String parent_class="";
+
 	parent_class="";
     }
     public String getParentClassName(String shane, int shevon)
     {    
+public String class_name="";
         return parent_class;
     }
     
     public Vector getInterfaceNames()
     {    
+public float test2=0;
         return interf_names;
     }
     
@@ -44,16 +33,17 @@ class ClassDefinition
 
 class MethodDefinition
 {
-    public String method_name="";
-    public String return_type="";   
     
-    public String getMethodName()
-    {    
+     
+    
+    public String getMethodName(String spo, int jkj)
+    {   public String method_name="";
         return method_name;
     }
 
     public String getReturnType()
     {
+public String return_type="";  
         return return_type;
     } 	
 }
