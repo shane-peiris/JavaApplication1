@@ -158,6 +158,10 @@ public class CriticalTextAnalyzer{
     
     public String cur_class="";
     public String prim_para="";
+    
+    public int class_line_count=0;
+    public int meth_line_count=0;
+    
    //ClassDefinition[] cd;
     
     CriticalTextAnalyzer(String u_file_path) 
@@ -350,6 +354,7 @@ public class CriticalTextAnalyzer{
                 meth--;
                 if(cls_meth_flag==0)
                 {
+                    //System.out.println(cur_line);
                     meth=0;
                 }
             }
@@ -361,12 +366,15 @@ public class CriticalTextAnalyzer{
             meth--;
             if(cls_meth_flag==0)
             {
+                //System.out.println(cur_line);
                 meth=0;
             }
         }
         if(cls_meth_flag>0 & meth>=2)
         {
-              //System.out.println(cur_line);
+            
+            //System.out.println(cur_line);
+              meth_line_count++;
               
               try
               {
@@ -395,6 +403,49 @@ public class CriticalTextAnalyzer{
               identify_variable("Count");  
         
         }
+        
+        
+        
+        
+        
+        
+         //Count Method Display
+//         if(cls_meth_flag>0 & meth==2)
+//         {
+//             System.out.println(meth_line_count+1);
+//             meth_line_count=0;
+//             System.out.println(cur_line);
+//              //System.out.println(class_line_count);
+//         }
+//         else 
+         if(cls_meth_flag>0 & meth==1 & (cur_line.matches("(.*?)\\((.*?)\\)(.*?)")))
+         {
+             System.out.println(meth_line_count+1);
+             meth_line_count=0;
+             System.out.println(cur_line);
+         
+         }
+         
+          //Count Class Count
+         if(cls_meth_flag>0 & meth>=0)
+         {
+             
+             class_line_count++;
+             //System.out.println(cur_line);
+              //System.out.println(class_line_count);
+         }
+         
+         
+         if(cls_meth_flag==0 & (!(cur_line.matches("class (.*?)"))))
+         {
+             
+             System.out.println(class_line_count+1);
+             //System.out.println(cur_line);
+             System.out.println("************************************************\n");
+             class_line_count=0;
+         }
+         
+        
         }
         catch(Exception ex)
         {
@@ -970,7 +1021,7 @@ public class CriticalTextAnalyzer{
             else if(proc_line.matches("(.*?)String (.*?)")){
                     //System.out.println(proc_line + prim_para);
                     //boolean_var_count = boolean_var_count + comma_count;
-                        if(meth_type.equals("Count"))
+                    if(meth_type.equals("Count"))
                     add_to_var_defs(proc_line,prim_para);
                     //last_var_type="boolean";
             }
