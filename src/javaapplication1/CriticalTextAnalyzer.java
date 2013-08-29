@@ -18,6 +18,7 @@ class ClassDefinition
     public Vector method_names = new Vector<Object>(); 
     public String parent_class="";
     public String class_name="";
+    public int class_line=0;
     
     public String getParentClassName()
     {    
@@ -33,6 +34,11 @@ class ClassDefinition
     {
         return method_names;
     }
+    
+    public int getNumberOfLines()
+    {
+        return class_line;
+    }
 }
 
 class MethodDefinition
@@ -40,7 +46,8 @@ class MethodDefinition
     public Vector para_Defs = new Vector<Object>();
     public Vector loc_variables = new Vector<Object>();
     public String method_name="";
-    public String return_type="";   
+    public String return_type=""; 
+    public int meth_line=0;
     
     public String getMethodName()
     {    
@@ -60,6 +67,11 @@ class MethodDefinition
     public Vector getLocalVariables()
     {    
         return loc_variables;        
+    }
+    
+    public int getNumberOfLines()
+    {
+        return meth_line;
     }
     
 }
@@ -193,6 +205,10 @@ public class CriticalTextAnalyzer{
         
         try
         {
+            
+          
+            
+            
             //Identify Class
         if((cur_line.contains("{"))&(prv_line.matches("class (.*?)"))&(cls_meth_flag==0))
         {        
@@ -207,7 +223,10 @@ public class CriticalTextAnalyzer{
             catch(Exception ex)
             {
                 class_in= prv_line.substring(6);
-            }   
+            }
+            
+            class_line_count=0;
+            
             class_in = class_in.replace("{", "");
             class_in = class_in.replace(" ", "");
             //System.out.println(class_in);
@@ -228,6 +247,9 @@ public class CriticalTextAnalyzer{
             {
                 class_in= cur_line.substring(6);
             }   
+            
+            class_line_count=0;
+            
             class_in = class_in.replace("{", "");
             class_in = class_in.replace(" ", "");
             //System.out.println(class_in);
@@ -257,7 +279,17 @@ public class CriticalTextAnalyzer{
             
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = "NULL";
+            try
+            {
+            md[md_count-1].meth_line = meth_line_count+1;
+            }
+            catch(Exception ex)
+            {
+            
+            }
             md_count++;
+            
+            meth_line_count=0;
             
             //identify_variable("count");
         } 
@@ -285,8 +317,18 @@ public class CriticalTextAnalyzer{
             
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = "NULL";
+            try
+            {
+            md[md_count-1].meth_line = meth_line_count+1;
+            }
+            catch(Exception ex)
+            {
+            
+            }
             md_count++;
             
+            
+            meth_line_count=0;
             //identify_variable("count");
         } 
         
@@ -313,8 +355,16 @@ public class CriticalTextAnalyzer{
             
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = meth_ret_type.toString();
-            md_count++;
+            try
+            {
+            md[md_count-1].meth_line = meth_line_count+1;
+            }
+            catch(Exception ex)
+            {
             
+            }
+            md_count++;
+            meth_line_count=0;
             //identify_variable("count");
         }  
          //Identify Method
@@ -338,8 +388,16 @@ public class CriticalTextAnalyzer{
             
             md[md_count].method_name = method_name.toString();
             md[md_count].return_type = meth_ret_type.toString();
-            md_count++;
+            try
+            {
+            md[md_count-1].meth_line = meth_line_count+1;
+            }
+            catch(Exception ex)
+            {
             
+            }
+            md_count++;
+            meth_line_count=0;
             //identify_variable("count");
             
         }  
@@ -354,6 +412,7 @@ public class CriticalTextAnalyzer{
                 meth--;
                 if(cls_meth_flag==0)
                 {
+                    cd_temp[cd_count-1].class_line=class_line_count+1;
                     //System.out.println(cur_line);
                     meth=0;
                 }
@@ -366,6 +425,7 @@ public class CriticalTextAnalyzer{
             meth--;
             if(cls_meth_flag==0)
             {
+                cd_temp[cd_count-1].class_line=class_line_count+1;
                 //System.out.println(cur_line);
                 meth=0;
             }
@@ -374,7 +434,7 @@ public class CriticalTextAnalyzer{
         {
             
             //System.out.println(cur_line);
-              meth_line_count++;
+              //meth_line_count++;
               
               try
               {
@@ -404,47 +464,16 @@ public class CriticalTextAnalyzer{
         
         }
         
+        if(cls_meth_flag>=1 & meth>=1)
+        {
+            class_line_count++;
+        }
         
+        if(cls_meth_flag>=1 & meth>=2)
+        {
+            meth_line_count++;
+        }  
         
-        
-        
-        
-         //Count Method Display
-//         if(cls_meth_flag>0 & meth==2)
-//         {
-//             System.out.println(meth_line_count+1);
-//             meth_line_count=0;
-//             System.out.println(cur_line);
-//              //System.out.println(class_line_count);
-//         }
-//         else 
-         if(cls_meth_flag>0 & meth==1 & (cur_line.matches("(.*?)\\((.*?)\\)(.*?)")))
-         {
-             System.out.println(meth_line_count+1);
-             meth_line_count=0;
-             System.out.println(cur_line);
-         
-         }
-         
-          //Count Class Count
-         if(cls_meth_flag>0 & meth>=0)
-         {
-             
-             class_line_count++;
-             //System.out.println(cur_line);
-              //System.out.println(class_line_count);
-         }
-         
-         
-         if(cls_meth_flag==0 & (!(cur_line.matches("class (.*?)"))))
-         {
-             
-             System.out.println(class_line_count+1);
-             //System.out.println(cur_line);
-             System.out.println("************************************************\n");
-             class_line_count=0;
-         }
-         
         
         }
         catch(Exception ex)
@@ -1298,7 +1327,7 @@ public class CriticalTextAnalyzer{
         //Close the buffer reader
         bufferReader.close();      
        
-        
+        md[md_count-1].meth_line = meth_line_count+1;
         //Display final total count of Alphanumeric Tokens
         System.out.println("\nTotal count of Alphanumeric Tokens (without comments and literal strings) : " + (tot_alpha_word_count));
         //System.out.println("\nTotal count of Literal Strings : " + tot_literal_string_count);
@@ -1360,6 +1389,8 @@ public class CriticalTextAnalyzer{
             
             System.out.println("\nClass Name : " + cd_temp[a].class_name);
             
+            System.out.println("Class Line Count : " + cd_temp[a].getNumberOfLines());
+            
             if(cd_temp[a].getParentClassName().equals(" "))
                 System.out.println("Parent Class : NULL");
             else
@@ -1394,8 +1425,12 @@ public class CriticalTextAnalyzer{
                 {
                     
                     System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " / Return Type : " + md[md_count].getReturnType() + "\n");
-                    
-                    
+                    try
+                    {
+                        System.out.println(" * Line Count : " + md[md_count].getNumberOfLines());
+                    }
+                    catch(Exception ex)
+                    {}
                     if(md[md_count].getParameterDefinitions().size()==0)
                     {
                     System.out.print("      No Parametereised Variable Definitions\n");
