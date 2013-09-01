@@ -16,6 +16,15 @@ System.out.println(cur_line);
     public String getParentClassName(String shane, int shevon)
     {    
 public String class_name="";
+
+	if(x=3)
+	{
+		if(x=4)
+		{
+
+		}
+	}
+
         return parent_class;
     }
     
@@ -37,13 +46,28 @@ class MethodDefinition
      
     
     public String getMethodName(String spo, int jkj)
-    {   public String method_name="";
+    {public String method_name="";
         return method_name;
+
+
+
+
+
+
+
     }
 
     public String getReturnType()
     {
 public String return_type="";  
         return return_type;
-    } 	
+	if(x=3)
+	{
+
+	}
+    } 
+
+public String getReturnType3()    
+{return return_type;} 
+	
 }

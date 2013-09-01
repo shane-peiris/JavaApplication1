@@ -19,6 +19,7 @@ class ClassDefinition
     public String parent_class="";
     public String class_name="";
     public int class_line=0;
+    public int max_class_nest_depth = 0;
     
     public String getParentClassName()
     {    
@@ -39,6 +40,11 @@ class ClassDefinition
     {
         return class_line;
     }
+    
+    public int getMaximumNesting()
+    {
+        return max_class_nest_depth;
+    }
 }
 
 class MethodDefinition
@@ -48,6 +54,7 @@ class MethodDefinition
     public String method_name="";
     public String return_type=""; 
     public int meth_line=0;
+    public int max_meth_nest_depth=0;
     
     public String getMethodName()
     {    
@@ -72,6 +79,10 @@ class MethodDefinition
     public int getNumberOfLines()
     {
         return meth_line;
+    }
+    public int getMaximumNesting()
+    {
+        return max_meth_nest_depth;
     }
     
 }
@@ -174,6 +185,9 @@ public class CriticalTextAnalyzer{
     public int class_line_count=0;
     public int meth_line_count=0;
     
+    public int max_meth_nest=0;
+    public int cur_meth_nest=0;
+    
    //ClassDefinition[] cd;
     
     CriticalTextAnalyzer(String u_file_path) 
@@ -209,272 +223,338 @@ public class CriticalTextAnalyzer{
           
             
             
+                //Identify Class
+            if((cur_line.contains("{"))&(prv_line.matches("class (.*?)"))&(cls_meth_flag==0))
+            {        
+                cls_meth_flag=1;  
+                meth=1;
+                //System.out.println("Inside class********************************************************");
+
+                try
+                {
+                    class_in= prv_line.substring(6,prv_line.indexOf(" ", 6));
+                }
+                catch(Exception ex)
+                {
+                    class_in= prv_line.substring(6);
+                }
+
+                class_line_count=0;
+
+                class_in = class_in.replace("{", "");
+                class_in = class_in.replace(" ", "");
+                //System.out.println(class_in);
+
+            }
             //Identify Class
-        if((cur_line.contains("{"))&(prv_line.matches("class (.*?)"))&(cls_meth_flag==0))
-        {        
-            cls_meth_flag=1;  
-            meth=1;
-            //System.out.println("Inside class********************************************************");
-            
-            try
+            else if((cur_line.contains("{"))&(cur_line.matches("class (.*?)"))&(cls_meth_flag==0) )
+            {        
+                cls_meth_flag=1;
+                meth=1;
+                //System.out.println("Inside class*************************************************");
+
+                try
+                {
+                    class_in= cur_line.substring(6,prv_line.indexOf(" ", 6));
+                }
+                catch(Exception ex)
+                {
+                    class_in= cur_line.substring(6);
+                }   
+
+
+                //System.out.println(String.valueOf(cur_meth_nest));
+
+                //cur_meth_nest=0;
+
+                class_line_count=0;
+
+                class_in = class_in.replace("{", "");
+                class_in = class_in.replace(" ", "");
+                //System.out.println(class_in);
+
+            }  
+            //Identify Constructor
+             else if(((cur_line.matches(class_in+" \\((.*?)\\)\\s+\\{"))|(cur_line.matches(class_in+"\\((.*?)\\)\\s+\\{"))|(cur_line.matches(class_in+"\\((.*?)\\)\\{"))|(cur_line.matches(class_in+"\\((.*?)\\)\\{")))&(meth==1)&((cur_line.contains("{"))))
             {
-                class_in= prv_line.substring(6,prv_line.indexOf(" ", 6));
+                cls_meth_flag++;
+                meth=2;         
+    //            System.out.println((cur_line.indexOf(" ", 0)+1));
+    //            System.out.println((cur_line.indexOf("(")));
+    //            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
+                method_name=cur_line.substring(0,((cur_line.indexOf("("))));
+                method_name = method_name.trim().replace(" ", "");
+                //System.out.println(method_name);  
+                chk_method_details.add(method_name);
+
+    //            meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
+    //            System.out.println(meth_ret_type);  
+    //            chk_method_details.add(meth_ret_type);
+
+                //System.out.println("Inside method***********************************************************");
+
+                cd_temp[cd_count-1].method_names.add(method_name.toString());
+
+
+                md[md_count].method_name = method_name.toString();
+                md[md_count].return_type = "NULL";
+                try
+                {
+                md[md_count-1].meth_line = meth_line_count+1;
+                }
+                catch(Exception ex)
+                {
+
+                }
+                md_count++;
+
+                //System.out.println(String.valueOf(cur_meth_nest));
+
+                //cur_meth_nest=0;
+                meth_line_count=0;
+
+                //identify_variable("count");
+            } 
+              //Identify Constructor
+              else if(((prv_line.matches(class_in+" \\((.*?)\\)"))|(prv_line.matches(class_in+"\\((.*?)\\)")))&(meth==1)&((cur_line.contains("{"))))
+            {
+                cls_meth_flag++;
+                meth=2;         
+    //            System.out.println((cur_line.indexOf(" ", 0)+1));
+    //            System.out.println((cur_line.indexOf("(")));
+    //            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
+                method_name=prv_line.substring(0,((prv_line.indexOf("("))));
+                method_name = method_name.trim().replace(" ", "");
+                //System.out.println(method_name);  
+                chk_method_details.add(method_name);
+
+    //            meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
+    //            System.out.println(meth_ret_type);  
+    //            chk_method_details.add(meth_ret_type);
+
+                //System.out.println("Inside method*********************************************************************");
+
+                cd_temp[cd_count-1].method_names.add(method_name.toString());
+
+
+                md[md_count].method_name = method_name.toString();
+                md[md_count].return_type = "NULL";
+                try
+                {
+                md[md_count-1].meth_line = meth_line_count+1;
+                }
+                catch(Exception ex)
+                {
+
+                }
+                md_count++;
+
+                //System.out.println(String.valueOf(cur_meth_nest));
+
+                //cur_meth_nest=0;
+
+                meth_line_count=0;
+                //identify_variable("count");
+            } 
+
+             //Identify Method
+            else if(((cur_line.matches("(.*?)\\((.*?)\\)\\s+\\{"))|(cur_line.matches("(.*?)\\((.*?)\\)\\{")))&(meth==1)&((cur_line.contains("{"))))
+            {
+                cls_meth_flag++;
+                meth=2;         
+    //            System.out.println((cur_line.indexOf(" ", 0)+1));
+    //            System.out.println((cur_line.indexOf("(")));
+    //            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
+                method_name=cur_line.substring((cur_line.indexOf(" ", 0)+1),((cur_line.indexOf("("))));
+                method_name = method_name.trim().replace(" ", "");
+                //System.out.println(method_name);  
+                chk_method_details.add(method_name);
+
+                meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
+                //System.out.println(meth_ret_type);  
+                chk_method_details.add(meth_ret_type);  
+                //System.out.println("Inside method******************************************************************");
+
+                cd_temp[cd_count-1].method_names.add(method_name.toString());
+
+
+                md[md_count].method_name = method_name.toString();
+                md[md_count].return_type = meth_ret_type.toString();
+                try
+                {
+                md[md_count-1].meth_line = meth_line_count+1;
+                }
+                catch(Exception ex)
+                {
+
+                }
+
+                //System.out.println(String.valueOf(cur_meth_nest));
+
+                //cur_meth_nest=0;
+
+
+                md_count++;
+                meth_line_count=0;
+                //identify_variable("count");
+            }  
+             //Identify Method
+            else if((prv_line.matches("(.*?)\\((.*?)\\)"))&(meth==1)&((cur_line.contains("{"))))
+            {
+                cls_meth_flag++; 
+                meth=2;
+
+                method_name=prv_line.substring((prv_line.indexOf(" ", 0)+1),((prv_line.indexOf("("))));
+                method_name = method_name.trim().replace(" ", "");
+                //System.out.println(method_name);   
+                chk_method_details.add(method_name);
+
+                meth_ret_type=prv_line.substring(0,(prv_line.indexOf(" ")));
+                //System.out.println(meth_ret_type); 
+                chk_method_details.add(meth_ret_type); 
+
+                //System.out.println("Inside method***********************************************************************");
+                cd_temp[cd_count-1].method_names.add(method_name.toString());
+
+
+                md[md_count].method_name = method_name.toString();
+                md[md_count].return_type = meth_ret_type.toString();
+                try
+                {
+                md[md_count-1].meth_line = meth_line_count+1;
+                }
+                catch(Exception ex)
+                {
+
+                }
+
+                //System.out.println(String.valueOf(cur_meth_nest));
+
+                //cur_meth_nest=0;
+
+
+                md_count++;
+                meth_line_count=0;
+                //identify_variable("count");
+
+            }  
+            else if(((cur_line.length()==1)&(cur_line.contains("{")))|(cur_line.substring((cur_line.length())-1).equals("{")))
+            {            
+                cls_meth_flag++; 
+                meth++;
+                //cur_meth_nest++;
+                //System.out.println("jjjj"+cur_line.substring((cur_line.length()-1)));
+                if((cur_line.substring((cur_line.length())-1).equals("}")))
+                {
+                    cls_meth_flag--;
+                    meth--;
+                    if(cls_meth_flag==0)
+                    {
+                        cd_temp[cd_count-1].class_line=class_line_count+1;
+                        cd_temp[cd_count-1].max_class_nest_depth=max_meth_nest+1;
+                        max_meth_nest = 0;
+                        //System.out.println(cur_line);
+                        meth=0;
+                    }
+                    
+                    if(meth==1)
+                    {
+                        try
+                        {
+                            md[md_count-1].max_meth_nest_depth = cur_meth_nest;
+                        }
+                        catch(Exception ex)
+                        {
+                            System.out.println("Error in Meth Nest");
+                        }
+                        if (max_meth_nest<cur_meth_nest)
+                        {
+                            max_meth_nest = cur_meth_nest;
+                        }
+                        //System.out.println(String.valueOf(cur_meth_nest));
+                        cur_meth_nest=0;
+                    }
+                }
+
             }
-            catch(Exception ex)
-            {
-                class_in= prv_line.substring(6);
-            }
-            
-            class_line_count=0;
-            
-            class_in = class_in.replace("{", "");
-            class_in = class_in.replace(" ", "");
-            //System.out.println(class_in);
-            
-        }
-        //Identify Class
-        else if((cur_line.contains("{"))&(cur_line.matches("class (.*?)"))&(cls_meth_flag==0) )
-        {        
-            cls_meth_flag=1;
-            meth=1;
-            //System.out.println("Inside class*************************************************");
-            
-            try
-            {
-                class_in= cur_line.substring(6,prv_line.indexOf(" ", 6));
-            }
-            catch(Exception ex)
-            {
-                class_in= cur_line.substring(6);
-            }   
-            
-            class_line_count=0;
-            
-            class_in = class_in.replace("{", "");
-            class_in = class_in.replace(" ", "");
-            //System.out.println(class_in);
-            
-        }  
-        //Identify Constructor
-         else if(((cur_line.matches(class_in+" \\((.*?)\\)\\s+\\{"))|(cur_line.matches(class_in+"\\((.*?)\\)\\s+\\{"))|(cur_line.matches(class_in+"\\((.*?)\\)\\{"))|(cur_line.matches(class_in+"\\((.*?)\\)\\{")))&(meth==1)&((cur_line.contains("{"))))
-        {
-            cls_meth_flag++;
-            meth=2;         
-//            System.out.println((cur_line.indexOf(" ", 0)+1));
-//            System.out.println((cur_line.indexOf("(")));
-//            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
-            method_name=cur_line.substring(0,((cur_line.indexOf("("))));
-            method_name = method_name.trim().replace(" ", "");
-            //System.out.println(method_name);  
-            chk_method_details.add(method_name);
-            
-//            meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
-//            System.out.println(meth_ret_type);  
-//            chk_method_details.add(meth_ret_type);
-            
-            //System.out.println("Inside method***********************************************************");
-            
-            cd_temp[cd_count-1].method_names.add(method_name.toString());
-            
-            
-            md[md_count].method_name = method_name.toString();
-            md[md_count].return_type = "NULL";
-            try
-            {
-            md[md_count-1].meth_line = meth_line_count+1;
-            }
-            catch(Exception ex)
-            {
-            
-            }
-            md_count++;
-            
-            meth_line_count=0;
-            
-            //identify_variable("count");
-        } 
-          //Identify Constructor
-          else if(((prv_line.matches(class_in+" \\((.*?)\\)"))|(prv_line.matches(class_in+"\\((.*?)\\)")))&(meth==1)&((cur_line.contains("{"))))
-        {
-            cls_meth_flag++;
-            meth=2;         
-//            System.out.println((cur_line.indexOf(" ", 0)+1));
-//            System.out.println((cur_line.indexOf("(")));
-//            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
-            method_name=prv_line.substring(0,((prv_line.indexOf("("))));
-            method_name = method_name.trim().replace(" ", "");
-            //System.out.println(method_name);  
-            chk_method_details.add(method_name);
-            
-//            meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
-//            System.out.println(meth_ret_type);  
-//            chk_method_details.add(meth_ret_type);
-            
-            //System.out.println("Inside method*********************************************************************");
-            
-            cd_temp[cd_count-1].method_names.add(method_name.toString());
-            
-            
-            md[md_count].method_name = method_name.toString();
-            md[md_count].return_type = "NULL";
-            try
-            {
-            md[md_count-1].meth_line = meth_line_count+1;
-            }
-            catch(Exception ex)
-            {
-            
-            }
-            md_count++;
-            
-            
-            meth_line_count=0;
-            //identify_variable("count");
-        } 
-        
-         //Identify Method
-        else if(((cur_line.matches("(.*?)\\((.*?)\\)\\s+\\{"))|(cur_line.matches("(.*?)\\((.*?)\\)\\{")))&(meth==1)&((cur_line.contains("{"))))
-        {
-            cls_meth_flag++;
-            meth=2;         
-//            System.out.println((cur_line.indexOf(" ", 0)+1));
-//            System.out.println((cur_line.indexOf("(")));
-//            System.out.println(((cur_line.indexOf("\\("))-(cur_line.indexOf(" ", 0))));
-            method_name=cur_line.substring((cur_line.indexOf(" ", 0)+1),((cur_line.indexOf("("))));
-            method_name = method_name.trim().replace(" ", "");
-            //System.out.println(method_name);  
-            chk_method_details.add(method_name);
-            
-            meth_ret_type=cur_line.substring(0,(cur_line.indexOf(" ")));
-            //System.out.println(meth_ret_type);  
-            chk_method_details.add(meth_ret_type);  
-            //System.out.println("Inside method******************************************************************");
-            
-            cd_temp[cd_count-1].method_names.add(method_name.toString());
-            
-            
-            md[md_count].method_name = method_name.toString();
-            md[md_count].return_type = meth_ret_type.toString();
-            try
-            {
-            md[md_count-1].meth_line = meth_line_count+1;
-            }
-            catch(Exception ex)
-            {
-            
-            }
-            md_count++;
-            meth_line_count=0;
-            //identify_variable("count");
-        }  
-         //Identify Method
-        else if((prv_line.matches("(.*?)\\((.*?)\\)"))&(meth==1)&((cur_line.contains("{"))))
-        {
-            cls_meth_flag++; 
-            meth=2;
-            
-            method_name=prv_line.substring((prv_line.indexOf(" ", 0)+1),((prv_line.indexOf("("))));
-            method_name = method_name.trim().replace(" ", "");
-            //System.out.println(method_name);   
-            chk_method_details.add(method_name);
-            
-            meth_ret_type=prv_line.substring(0,(prv_line.indexOf(" ")));
-            //System.out.println(meth_ret_type); 
-            chk_method_details.add(meth_ret_type); 
-            
-            //System.out.println("Inside method***********************************************************************");
-            cd_temp[cd_count-1].method_names.add(method_name.toString());
-            
-            
-            md[md_count].method_name = method_name.toString();
-            md[md_count].return_type = meth_ret_type.toString();
-            try
-            {
-            md[md_count-1].meth_line = meth_line_count+1;
-            }
-            catch(Exception ex)
-            {
-            
-            }
-            md_count++;
-            meth_line_count=0;
-            //identify_variable("count");
-            
-        }  
-        else if(((cur_line.length()==1)&(cur_line.contains("{")))|(cur_line.substring((cur_line.length())-1).equals("{")))
-        {            
-            cls_meth_flag++; 
-            meth++;
-            //System.out.println("jjjj"+cur_line.substring((cur_line.length()-1)));
-            if((cur_line.substring((cur_line.length())-1).equals("}")))
+            else if(((cur_line.length()==1)&(cur_line.contains("}")))|(cur_line.substring((cur_line.length())-1).equals("}")))
             {
                 cls_meth_flag--;
                 meth--;
+                if(meth==1)
+                    {
+                        try
+                        {
+                            md[md_count-1].max_meth_nest_depth = cur_meth_nest;
+                        }
+                        catch(Exception ex)
+                        {
+                            System.out.println("Error in Meth Nest");
+                        }
+                        if (max_meth_nest<cur_meth_nest)
+                        {
+                            max_meth_nest = cur_meth_nest;
+                        }   
+                        //System.out.println(String.valueOf(cur_meth_nest));
+                        cur_meth_nest=0;
+                    }
                 if(cls_meth_flag==0)
                 {
                     cd_temp[cd_count-1].class_line=class_line_count+1;
+                    cd_temp[cd_count-1].max_class_nest_depth=max_meth_nest+1;
+                    max_meth_nest = 0;
                     //System.out.println(cur_line);
                     meth=0;
                 }
+                
             }
-            
-        }
-        else if(((cur_line.length()==1)&(cur_line.contains("}")))|(cur_line.substring((cur_line.length())-1).equals("}")))
-        {
-            cls_meth_flag--;
-            meth--;
-            if(cls_meth_flag==0)
+            if(cls_meth_flag>0 & meth>=2)
             {
-                cd_temp[cd_count-1].class_line=class_line_count+1;
+
                 //System.out.println(cur_line);
-                meth=0;
+                  //meth_line_count++;
+
+                  try
+                  {
+                      md[md_count] = new MethodDefinition();
+                  }
+                  catch(Exception ex)
+                  {
+                      //System.out.println(ex.toString());
+                  }
+
+                  identify_variable("Count");  
             }
-        }
-        if(cls_meth_flag>0 & meth>=2)
-        {
-            
-            //System.out.println(cur_line);
-              //meth_line_count++;
-              
-              try
-              {
-                  md[md_count] = new MethodDefinition();
-              }
-              catch(Exception ex)
-              {
-                  //System.out.println(ex.toString());
-              }
-              
-              identify_variable("Count");  
-        }
-        else if(cls_meth_flag>0 & meth>=1 & (cur_line.matches("(.*?)\\((.*?)\\)(.*?)")))
-        {
-              //System.out.println(cur_line);
-              
-              try
-              {
-                  md[md_count] = new MethodDefinition();
-              }
-              catch(Exception ex)
-              {
-                  //System.out.println(ex.toString());
-              }
-              
-              identify_variable("Count");  
+            else if(cls_meth_flag>0 & meth>=1 & (cur_line.matches("(.*?)\\((.*?)\\)(.*?)")))
+            {
+                  //System.out.println(cur_line);
+
+                  try
+                  {
+                      md[md_count] = new MethodDefinition();
+                  }
+                  catch(Exception ex)
+                  {
+                      //System.out.println(ex.toString());
+                  }
+
+                  identify_variable("Count");  
+
+            }
         
-        }
-        
-        if(cls_meth_flag>=1 & meth>=1)
-        {
-            class_line_count++;
-        }
-        
-        if(cls_meth_flag>=1 & meth>=2)
-        {
-            meth_line_count++;
-        }  
-        
-        
+            if(cls_meth_flag>=1 & meth>=1)
+            {
+                class_line_count++;
+            }
+
+            if(cls_meth_flag>=1 & meth>=2)
+            {
+                meth_line_count++;
+            }  
+            if((((cur_line.length()==1)&(cur_line.contains("{")))|(cur_line.substring((cur_line.length())-1).equals("{"))|(cur_line.contains("{")))& (cls_meth_flag>=1 & meth>=2))
+            {
+                cur_meth_nest++;
+            }
         }
         catch(Exception ex)
         {
@@ -1325,9 +1405,19 @@ public class CriticalTextAnalyzer{
 //        
 //        }
         //Close the buffer reader
-        bufferReader.close();      
-       
+        bufferReader.close();   
+        
+        //Special Section START
+        
+        //Last Class Details
+        cd_temp[cd_count-1].class_line=class_line_count+1;
+        cd_temp[cd_count-1].max_class_nest_depth=max_meth_nest+1;
+        //Last Method Details
         md[md_count-1].meth_line = meth_line_count+1;
+        
+        //Special Section END
+        
+        
         //Display final total count of Alphanumeric Tokens
         System.out.println("\nTotal count of Alphanumeric Tokens (without comments and literal strings) : " + (tot_alpha_word_count));
         //System.out.println("\nTotal count of Literal Strings : " + tot_literal_string_count);
@@ -1390,6 +1480,7 @@ public class CriticalTextAnalyzer{
             System.out.println("\nClass Name : " + cd_temp[a].class_name);
             
             System.out.println("Class Line Count : " + cd_temp[a].getNumberOfLines());
+            System.out.println("Max Class Nest Depth : " + cd_temp[a].getMaximumNesting());
             
             if(cd_temp[a].getParentClassName().equals(" "))
                 System.out.println("Parent Class : NULL");
@@ -1409,6 +1500,8 @@ public class CriticalTextAnalyzer{
             
             }
             
+            try
+            {
             if((cd_temp[a].getMethodDefinitions().size()==1) & (cd_temp[a].getMethodDefinitions().elementAt(0).equals(" ")))
                 System.out.println("Methods : NULL");
             else
@@ -1424,13 +1517,21 @@ public class CriticalTextAnalyzer{
                 for(int z=0;z<cd_temp[a].getMethodDefinitions().size();z++)
                 {
                     
-                    System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " / Return Type : " + md[md_count].getReturnType() + "\n");
+                    System.out.println(" * Method Name : " + cd_temp[a].getMethodDefinitions().elementAt(z) + " / Return Type : " + md[md_count].getReturnType());
                     try
                     {
-                        System.out.println(" * Line Count : " + md[md_count].getNumberOfLines());
+                        System.out.println(" * Line Count  : " + md[md_count].getNumberOfLines());
                     }
                     catch(Exception ex)
                     {}
+                    
+                    try
+                    {
+                        System.out.println(" * Max Method Nest Depth : " + md[md_count].getMaximumNesting()+"\n");
+                    }
+                    catch(Exception ex)
+                    {}
+                    
                     if(md[md_count].getParameterDefinitions().size()==0)
                     {
                     System.out.print("      No Parametereised Variable Definitions\n");
@@ -1478,6 +1579,12 @@ public class CriticalTextAnalyzer{
                     
                 }
             }
+            }
+            catch(Exception ex)
+            {
+                System.out.println("Methods : NULL");
+            }
+        
         }
         
 //        System.out.println("\n*********************Method Details*****************************\n");
